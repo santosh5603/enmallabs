@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useSpring, useTransform, useInView } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform, useInView, Variants } from 'framer-motion';
 
 /**
  * TextScramble Component
@@ -152,7 +152,7 @@ export const TextReveal: React.FC<TextRevealProps> = ({ text, className = "", de
   
   const words = text.split(" ");
   
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: (i = 1) => ({
       opacity: 1,
@@ -160,7 +160,7 @@ export const TextReveal: React.FC<TextRevealProps> = ({ text, className = "", de
     }),
   };
   
-  const childVariants = {
+  const childVariants: Variants = {
     visible: {
       opacity: 1,
       y: 0,
