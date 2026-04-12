@@ -15,11 +15,12 @@ export const ContainerScroll = ({
     offset: ["start end", "end start"],
   });
   
-  // Wrap scroll progress in a spring to make it buttery smooth with ease out/in effects
+  // Since global smooth scrolling was removed, we absolutely need local physics
+  // over the 3D scroll effect or it will tie rigidly to chunky mouse-wheel ticks.
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 40,
-    damping: 15,
-    mass: 0.5
+    stiffness: 80,
+    damping: 20,
+    mass: 0.1
   });
 
   const [isMobile, setIsMobile] = React.useState(false);
