@@ -188,4 +188,8 @@ The backend also processes a secure `/start` intercept on the n8n Telegram bridg
 - DPA acceptance is cryptographically logged before any data flows
 
 
+---
 
+## License
+
+This project is proprietary software. All rights reserved © 2025 Enma Labs.
