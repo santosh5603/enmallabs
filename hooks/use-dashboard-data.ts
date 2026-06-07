@@ -25,9 +25,18 @@ export interface DocumentRecord {
   ca_firm_id: string;
   client_id: string | null;
   document_type: string | null;
-  original_file_name: string;
   processing_status: string;
-  processing_error: string | null;
+  source_file_ids: any;
+  extraction_data: any;
+  tax_verdict: any;
+  verification_result: any;
+  filing_period_month: number | null;
+  filing_period_year: number | null;
+  processing_time_ms: number | null;
+  created_at: string;
+  updated_at: string | null;
+  // Computed from extraction_data for UI compatibility
+  original_file_name: string;
   total_amount: number | null;
   vendor_name: string | null;
   buyer_name: string | null;
@@ -35,28 +44,25 @@ export interface DocumentRecord {
   buyer_gstin: string | null;
   invoice_number: string | null;
   transaction_date: string | null;
-  itc_eligible: boolean | null;
-  compliance_flags: any;
-  extracted_data: any;
-  created_at: string;
-  source_channel: string | null;
-  tax_period_month: number | null;
-  tax_period_year: number | null;
+  intent_tag: string | null;
 }
 
 export interface ChatLogRecord {
   id: string;
-  firm_id: string | null;
   ca_firm_id: string | null;
   client_id: string | null;
-  telegram_chat_id: string | null;
+  chat_id: number | null;
+  role: string;
+  content: string;
+  message_id: number | null;
+  metadata: any;
+  created_at: string;
+  // Mapped fields for UI compatibility
   user_message: string;
   bot_response: string;
   intent_tag: string | null;
-  tools_called: any;
   is_error: boolean | null;
   response_time_ms: number | null;
-  created_at: string;
 }
 
 export interface ClientInfo {
@@ -87,8 +93,10 @@ export interface FirmData {
   phone: string | null;
   telegram_chat_id: string | null;
   telegram_linked_at: string | null;
+  admin_chat_id: number | null;
   is_active: boolean;
   subscription_plan: string;
+  subscription_tier: string;
   onboarding_completed: boolean;
   dpa_consented: boolean;
   dpa_consented_at: string | null;
@@ -96,6 +104,32 @@ export interface FirmData {
   created_at: string;
   updated_at: string | null;
   known_groups: any;
+}
+
+// ─── Helpers for extraction_data ─────────────────────────────────────────────
+
+function extractDocField(doc: any, field: string): any {
+  // Try extraction_data first, then top-level
+  if (doc.extraction_data && typeof doc.extraction_data === 'object') {
+    if (doc.extraction_data[field] !== undefined) return doc.extraction_data[field];
+  }
+  return doc[field] ?? null;
+}
+
+function mapDocumentRecord(raw: any): DocumentRecord {
+  const ed = raw.extraction_data || {};
+  return {
+    ...raw,
+    original_file_name: ed.file_name || ed.original_file_name || `Document ${raw.document_type || 'Unknown'}`,
+    total_amount: ed.total_amount ?? ed.invoice_value ?? ed.amount ?? null,
+    vendor_name: ed.vendor_name ?? ed.supplier_name ?? ed.seller_name ?? null,
+    buyer_name: ed.buyer_name ?? ed.customer_name ?? null,
+    vendor_gstin: ed.vendor_gstin ?? ed.supplier_gstin ?? null,
+    buyer_gstin: ed.buyer_gstin ?? ed.customer_gstin ?? null,
+    invoice_number: ed.invoice_number ?? ed.invoice_no ?? null,
+    transaction_date: ed.transaction_date ?? ed.invoice_date ?? null,
+    intent_tag: ed.intent_tag ?? raw.document_type ?? null,
+  };
 }
 
 // ─── useFirmData ─────────────────────────────────────────────────────────────
@@ -171,8 +205,8 @@ export function useDashboardStats(firmId: string | null) {
     const supabase = getSupabase();
 
     const [docsResult, chatsResult] = await Promise.all([
-      supabase.from('documents').select('id, document_type, processing_status, total_amount, intent_tag').eq('ca_firm_id', firmId),
-      supabase.from('chat_logs').select('id, intent_tag').or(`firm_id.eq.${firmId},ca_firm_id.eq.${firmId}`),
+      supabase.from('documents').select('id, document_type, processing_status, extraction_data').eq('ca_firm_id', firmId),
+      supabase.from('conversations').select('id, role, metadata').eq('ca_firm_id', firmId),
     ]);
 
     const docs = docsResult.data || [];
@@ -186,25 +220,31 @@ export function useDashboardStats(firmId: string | null) {
       const dt = d.document_type || 'unknown';
       documentTypes[dt] = (documentTypes[dt] || 0) + 1;
       statuses[d.processing_status] = (statuses[d.processing_status] || 0) + 1;
-      if (d.total_amount) totalAmount += d.total_amount;
+      const ed = d.extraction_data || {};
+      const amt = ed.total_amount ?? ed.invoice_value ?? ed.amount ?? 0;
+      if (amt) totalAmount += amt;
     });
 
     const intentTags: Record<string, number> = {};
     chats.forEach((c: any) => {
-      const tag = c.intent_tag || 'unknown';
+      const meta = c.metadata || {};
+      const tag = meta.intent_tag || c.role || 'unknown';
       intentTags[tag] = (intentTags[tag] || 0) + 1;
     });
 
-    const extracted = statuses['extracted'] || 0;
-    const failed = statuses['failed'] || 0;
-    const received = statuses['received'] || 0;
+    const extracted = statuses['extracted'] || statuses['completed'] || statuses['processed'] || 0;
+    const failed = statuses['failed'] || statuses['error'] || 0;
+    const received = statuses['received'] || statuses['pending'] || statuses['processing'] || 0;
+
+    // Count unique conversations (pairs of user+assistant messages)
+    const totalConversations = chats.filter((c: any) => c.role === 'user').length;
 
     setStats({
       totalDocuments: docs.length,
       extractedDocuments: extracted,
       failedDocuments: failed,
       pendingDocuments: received,
-      totalChatLogs: chats.length,
+      totalChatLogs: totalConversations,
       gstQueries: intentTags['gst_query'] || 0,
       consultantQueries: intentTags['consultant_query'] || 0,
       processingRate: docs.length > 0 ? Math.round((extracted / docs.length) * 100 * 10) / 10 : 0,
@@ -221,7 +261,7 @@ export function useDashboardStats(firmId: string | null) {
     if (!firmId) return;
     const supabase = getSupabase();
 
-    // Realtime: re-fetch stats when documents or chat_logs change
+    // Realtime: re-fetch stats when documents or conversations change
     channelRef.current = supabase
       .channel(`stats-${firmId}`)
       .on(
@@ -231,7 +271,7 @@ export function useDashboardStats(firmId: string | null) {
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'chat_logs', filter: `ca_firm_id=eq.${firmId}` },
+        { event: '*', schema: 'public', table: 'conversations', filter: `ca_firm_id=eq.${firmId}` },
         () => fetchStats()
       )
       .subscribe();
@@ -275,18 +315,10 @@ export function useDocuments(firmId: string | null, filters: DocumentFilters) {
     if (filters.dateTo) {
       query = query.lte('created_at', filters.dateTo + 'T23:59:59');
     }
-    if (filters.vendor) {
-      query = query.ilike('vendor_name', `%${filters.vendor}%`);
-    }
-    if (filters.search) {
-      query = query.or(
-        `original_file_name.ilike.%${filters.search}%,vendor_name.ilike.%${filters.search}%,buyer_name.ilike.%${filters.search}%,invoice_number.ilike.%${filters.search}%`
-      );
-    }
 
     const { data, error, count } = await query;
     if (!error) {
-      setDocuments(data as DocumentRecord[]);
+      setDocuments((data || []).map(mapDocumentRecord));
       setTotalCount(count || 0);
     }
     setLoading(false);
@@ -332,31 +364,26 @@ export function useClients(firmId: string | null) {
     const [docsResult, clientsResult] = await Promise.all([
       supabase
         .from('documents')
-        .select('vendor_name, buyer_name, document_type, processing_status, total_amount, created_at')
+        .select('document_type, processing_status, extraction_data, created_at')
         .eq('ca_firm_id', firmId),
       supabase
         .from('clients')
-        .select('client_name, created_at')
+        .select('trade_name, legal_name, created_at')
         .eq('ca_firm_id', firmId)
     ]);
 
     const docs = docsResult.data;
     const manualClients = clientsResult.data;
 
-    if (!docs) {
-      setClients([]);
-      setLoading(false);
-      return;
-    }
-
     const clientMap = new Map<string, ClientInfo>();
 
-    // First, add all manually created clients
+    // Add all manually created clients
     if (manualClients) {
       manualClients.forEach((c: any) => {
-        if (!c.client_name || c.client_name === 'Unknown') return;
-        clientMap.set(c.client_name, {
-          name: c.client_name,
+        const name = c.trade_name || c.legal_name || 'Unknown';
+        if (name === 'Unknown') return;
+        clientMap.set(name, {
+          name,
           documentCount: 0,
           totalAmount: 0,
           lastActivity: c.created_at,
@@ -366,36 +393,38 @@ export function useClients(firmId: string | null) {
       });
     }
 
-    // Then, aggregate from documents
+    // Aggregate from documents
     if (docs) {
       docs.forEach((doc: any) => {
-        const name = doc.vendor_name || doc.buyer_name || 'Unknown';
+        const ed = doc.extraction_data || {};
+        const name = ed.vendor_name || ed.supplier_name || ed.buyer_name || ed.customer_name || 'Unknown';
         if (name === 'Unknown') return;
 
-      const existing = clientMap.get(name);
-      if (existing) {
-        existing.documentCount++;
-        existing.totalAmount += doc.total_amount || 0;
-        if (doc.created_at > existing.lastActivity) {
-          existing.lastActivity = doc.created_at;
+        const amt = ed.total_amount ?? ed.invoice_value ?? ed.amount ?? 0;
+        const existing = clientMap.get(name);
+        if (existing) {
+          existing.documentCount++;
+          existing.totalAmount += amt;
+          if (doc.created_at > existing.lastActivity) {
+            existing.lastActivity = doc.created_at;
+          }
+          if (doc.document_type && !existing.documentTypes.includes(doc.document_type)) {
+            existing.documentTypes.push(doc.document_type);
+          }
+          if (doc.processing_status && !existing.statuses.includes(doc.processing_status)) {
+            existing.statuses.push(doc.processing_status);
+          }
+        } else {
+          clientMap.set(name, {
+            name,
+            documentCount: 1,
+            totalAmount: amt,
+            lastActivity: doc.created_at,
+            documentTypes: doc.document_type ? [doc.document_type] : [],
+            statuses: doc.processing_status ? [doc.processing_status] : [],
+          });
         }
-        if (doc.document_type && !existing.documentTypes.includes(doc.document_type)) {
-          existing.documentTypes.push(doc.document_type);
-        }
-        if (doc.processing_status && !existing.statuses.includes(doc.processing_status)) {
-          existing.statuses.push(doc.processing_status);
-        }
-      } else {
-        clientMap.set(name, {
-          name,
-          documentCount: 1,
-          totalAmount: doc.total_amount || 0,
-          lastActivity: doc.created_at,
-          documentTypes: doc.document_type ? [doc.document_type] : [],
-          statuses: doc.processing_status ? [doc.processing_status] : [],
-        });
-      }
-    });
+      });
     }
 
     setClients(
@@ -458,34 +487,39 @@ export function useRecentActivity(firmId: string | null, limit: number = 10) {
     const [docsResult, chatsResult] = await Promise.all([
       supabase
         .from('documents')
-        .select('id, vendor_name, original_file_name, document_type, processing_status, created_at, total_amount')
+        .select('id, document_type, processing_status, extraction_data, created_at')
         .eq('ca_firm_id', firmId)
         .order('created_at', { ascending: false })
         .limit(limit),
       supabase
-        .from('chat_logs')
-        .select('id, user_message, bot_response, intent_tag, created_at')
-        .or(`firm_id.eq.${firmId},ca_firm_id.eq.${firmId}`)
+        .from('conversations')
+        .select('id, role, content, metadata, created_at')
+        .eq('ca_firm_id', firmId)
+        .eq('role', 'user')
         .order('created_at', { ascending: false })
         .limit(limit),
     ]);
 
-    const docActivities: ActivityItem[] = (docsResult.data || []).map((d: any) => ({
-      id: d.id,
-      type: 'document' as const,
-      title: d.vendor_name || d.original_file_name,
-      description: `${formatDocType(d.document_type)} — ${d.original_file_name}`,
-      status: d.processing_status,
-      timestamp: d.created_at,
-      metadata: { total_amount: d.total_amount, document_type: d.document_type },
-    }));
+    const docActivities: ActivityItem[] = (docsResult.data || []).map((d: any) => {
+      const ed = d.extraction_data || {};
+      const name = ed.vendor_name || ed.supplier_name || ed.file_name || `${formatDocType(d.document_type)} Document`;
+      return {
+        id: d.id,
+        type: 'document' as const,
+        title: name,
+        description: `${formatDocType(d.document_type)} — ${ed.invoice_number || ed.file_name || 'Processing...'}`,
+        status: d.processing_status,
+        timestamp: d.created_at,
+        metadata: { total_amount: ed.total_amount ?? ed.invoice_value, document_type: d.document_type },
+      };
+    });
 
     const chatActivities: ActivityItem[] = (chatsResult.data || []).map((c: any) => ({
       id: c.id,
       type: 'chat' as const,
-      title: c.user_message.length > 60 ? c.user_message.substring(0, 60) + '...' : c.user_message,
-      description: `Bot: ${c.bot_response?.substring(0, 80)}...`,
-      status: c.intent_tag || 'chat',
+      title: c.content.length > 60 ? c.content.substring(0, 60) + '...' : c.content,
+      description: `Chat message`,
+      status: c.metadata?.intent_tag || 'chat',
       timestamp: c.created_at,
     }));
 
@@ -514,7 +548,7 @@ export function useRecentActivity(firmId: string | null, limit: number = 10) {
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_logs', filter: `ca_firm_id=eq.${firmId}` },
+        { event: 'INSERT', schema: 'public', table: 'conversations', filter: `ca_firm_id=eq.${firmId}` },
         () => fetchActivity()
       )
       .subscribe();
@@ -537,28 +571,59 @@ export function useChatLogs(firmId: string | null, limit: number = 50) {
     if (!firmId) return;
     const supabase = getSupabase();
 
-    const fetch = async () => {
+    const fetchLogs = async () => {
+      // Fetch from conversations table and pair user/assistant messages
       const { data } = await supabase
-        .from('chat_logs')
+        .from('conversations')
         .select('*')
-        .or(`firm_id.eq.${firmId},ca_firm_id.eq.${firmId}`)
+        .eq('ca_firm_id', firmId)
         .order('created_at', { ascending: false })
-        .limit(limit);
+        .limit(limit * 2); // fetch extra since we pair user+assistant
 
-      setChatLogs((data || []) as ChatLogRecord[]);
+      const rawMessages = data || [];
+
+      // Group into user-assistant pairs for the chat UI
+      const pairedLogs: ChatLogRecord[] = [];
+      const userMessages = rawMessages.filter((m: any) => m.role === 'user');
+      const assistantMessages = rawMessages.filter((m: any) => m.role === 'assistant');
+
+      // Simple pairing: match by proximity in time
+      userMessages.forEach((userMsg: any) => {
+        // Find the closest assistant response after this user message
+        const response = assistantMessages.find((a: any) =>
+          new Date(a.created_at) >= new Date(userMsg.created_at)
+        );
+
+        pairedLogs.push({
+          id: userMsg.id,
+          ca_firm_id: userMsg.ca_firm_id,
+          client_id: userMsg.client_id,
+          chat_id: userMsg.chat_id,
+          role: userMsg.role,
+          content: userMsg.content,
+          message_id: userMsg.message_id,
+          metadata: userMsg.metadata,
+          created_at: userMsg.created_at,
+          user_message: userMsg.content,
+          bot_response: response?.content || 'Processing...',
+          intent_tag: userMsg.metadata?.intent_tag || null,
+          is_error: userMsg.metadata?.is_error || false,
+          response_time_ms: response?.metadata?.response_time_ms || null,
+        });
+      });
+
+      setChatLogs(pairedLogs.slice(0, limit));
       setLoading(false);
     };
 
-    fetch();
+    fetchLogs();
 
     const channel = supabase
       .channel(`chats-${firmId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_logs', filter: `ca_firm_id=eq.${firmId}` },
-        (payload) => {
-          setChatLogs((prev) => [payload.new as ChatLogRecord, ...prev].slice(0, limit));
-        }
+        { event: 'INSERT', schema: 'public', table: 'conversations', filter: `ca_firm_id=eq.${firmId}` },
+        () => fetchLogs()
       )
       .subscribe();
 

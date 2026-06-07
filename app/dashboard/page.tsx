@@ -1,6 +1,6 @@
 'use client';
 
-import { useDashboard } from './layout';
+import { useDashboard } from './dashboard-context';
 import { useDashboardStats, useRecentActivity, useDocuments, formatRelativeTime, formatDocType } from '@/hooks/use-dashboard-data';
 import type { DocumentFilters } from '@/hooks/use-dashboard-data';
 import { StatsCard } from '@/components/dashboard/StatsCard';

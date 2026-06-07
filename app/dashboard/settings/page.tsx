@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useDashboard } from '../layout';
+import { useDashboard } from '../dashboard-context';
 import { getSupabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import {

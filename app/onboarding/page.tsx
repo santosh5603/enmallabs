@@ -14,7 +14,9 @@ export default function OnboardingPage() {
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [agreed, setAgreed] = useState(false);
+  const [dpaAgreed, setDpaAgreed] = useState(false);
+  const [privacyAgreed, setPrivacyAgreed] = useState(false);
+  const [dataTrainingConsent, setDataTrainingConsent] = useState(false);
 
   const [formData, setFormData] = useState({
     firmName: '',
@@ -77,9 +79,11 @@ export default function OnboardingPage() {
             phone: formData.phone,
             email: user.email,
             onboarding_completed: true,
-            dpa_consented: true,
+            dpa_consented: dpaAgreed,
             dpa_consented_at: new Date().toISOString(),
-            data_training_consent: agreed,
+            privacy_policy_consented: privacyAgreed,
+            privacy_policy_consented_at: new Date().toISOString(),
+            data_training_consent: dataTrainingConsent,
             last_login: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
@@ -99,9 +103,11 @@ export default function OnboardingPage() {
             onboarding_completed: true,
             is_active: true,
             subscription_plan: 'trial',
-            dpa_consented: true,
+            dpa_consented: dpaAgreed,
             dpa_consented_at: new Date().toISOString(),
-            data_training_consent: agreed,
+            privacy_policy_consented: privacyAgreed,
+            privacy_policy_consented_at: new Date().toISOString(),
+            data_training_consent: dataTrainingConsent,
             last_login: new Date().toISOString(),
           });
 
@@ -224,43 +230,70 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            {/* DPA & Data Training Consent */}
-            <div className="h-[160px] overflow-y-auto bg-white/[0.02] border border-white/10 rounded-2xl p-6 text-sm text-white/40 space-y-4 custom-scrollbar">
-              <div>
-                <strong className="text-white block mb-1">Purpose:</strong>
-                Enma Labs uses uploaded documents strictly for OCR extraction, tax reconciliation, and authorized CA operations.
-              </div>
-              <div>
-                <strong className="text-white block mb-1">Isolation:</strong>
-                Your firm&apos;s data is logically isolated and encrypted at rest.
-              </div>
-              <div>
-                <strong className="text-white block mb-1">Data Training:</strong>
-                By consenting below, you allow anonymized, aggregated data to be used for improving our AI models. Your client&apos;s personally identifiable information is never used.
-              </div>
-            </div>
+            {/* Consent Checkboxes */}
+            <div className="space-y-4 pt-2">
+              {/* DPA Consent */}
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <div className="relative flex items-center justify-center mt-1">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={dpaAgreed}
+                    onChange={(e) => setDpaAgreed(e.target.checked)}
+                    className="peer appearance-none w-5 h-5 border border-white/20 rounded-lg bg-white/5 checked:bg-accent checked:border-accent transition-all cursor-pointer"
+                  />
+                  <Check className="w-3.5 h-3.5 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-sm text-white/50 group-hover:text-white transition-colors leading-relaxed">
+                  I agree to the <span className="text-white font-medium">Data Processing Addendum (DPA)</span>.
+                  {' '}<Link href="/dpa" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline inline-flex items-center gap-0.5 ml-1 font-semibold">
+                    Read More
+                  </Link>
+                </span>
+              </label>
 
-            <label className="flex items-start gap-4 cursor-pointer group py-2">
-              <div className="relative flex items-center justify-center mt-1">
-                <input
-                  type="checkbox"
-                  required
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="peer appearance-none w-5 h-5 border border-white/20 rounded-lg bg-white/5 checked:bg-accent checked:border-accent transition-all cursor-pointer"
-                />
-                <Check className="w-3.5 h-3.5 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
-              </div>
-              <span className="text-sm text-white/50 group-hover:text-white transition-colors leading-relaxed">
-                I agree to the Data Processing Agreement and consent to anonymized data usage for AI model improvement.
-              </span>
-            </label>
+              {/* Privacy Policy Consent */}
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <div className="relative flex items-center justify-center mt-1">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={privacyAgreed}
+                    onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                    className="peer appearance-none w-5 h-5 border border-white/20 rounded-lg bg-white/5 checked:bg-accent checked:border-accent transition-all cursor-pointer"
+                  />
+                  <Check className="w-3.5 h-3.5 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-sm text-white/50 group-hover:text-white transition-colors leading-relaxed">
+                  I agree to the <span className="text-white font-medium">Privacy Policy</span> and consent to data processing.
+                  {' '}<Link href="/privacy" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline inline-flex items-center gap-0.5 ml-1 font-semibold">
+                    Read More
+                  </Link>
+                </span>
+              </label>
+
+              {/* AI Model Training Consent (Optional) */}
+              <label className="flex items-start gap-4 cursor-pointer group">
+                <div className="relative flex items-center justify-center mt-1">
+                  <input
+                    type="checkbox"
+                    checked={dataTrainingConsent}
+                    onChange={(e) => setDataTrainingConsent(e.target.checked)}
+                    className="peer appearance-none w-5 h-5 border border-white/20 rounded-lg bg-white/5 checked:bg-accent checked:border-accent transition-all cursor-pointer"
+                  />
+                  <Check className="w-3.5 h-3.5 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-sm text-white/50 group-hover:text-white transition-colors leading-relaxed">
+                  I consent to the use of anonymized, aggregated data for improving AI models (optional).
+                </span>
+              </label>
+            </div>
 
             <GlassButton
               type="submit"
               variant="white"
-              className="w-full mt-4"
-              disabled={!agreed || loading}
+              className="w-full mt-6"
+              disabled={!dpaAgreed || !privacyAgreed || loading}
             >
               {loading ? (
                 <span className="flex items-center gap-2 justify-center">

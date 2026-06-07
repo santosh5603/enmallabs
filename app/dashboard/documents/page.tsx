@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useDashboard } from '../layout';
+import { useDashboard } from '../dashboard-context';
 import { useDocuments, formatRelativeTime, formatCurrency, formatDocType } from '@/hooks/use-dashboard-data';
 import type { DocumentRecord, DocumentFilters } from '@/hooks/use-dashboard-data';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';

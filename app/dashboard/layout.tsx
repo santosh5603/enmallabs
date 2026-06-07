@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useFirmData, type FirmData } from '@/hooks/use-dashboard-data';
@@ -21,26 +21,7 @@ import {
   X,
   MessageCircle,
 } from 'lucide-react';
-
-// ─── Context ─────────────────────────────────────────────────────────────────
-
-interface DashboardContextValue {
-  user: any;
-  firmData: FirmData | null;
-  firmLoading: boolean;
-  globalSearch: string;
-  setGlobalSearch: (v: string) => void;
-}
-
-const DashboardContext = createContext<DashboardContextValue>({
-  user: null,
-  firmData: null,
-  firmLoading: true,
-  globalSearch: '',
-  setGlobalSearch: () => {},
-});
-
-export const useDashboard = () => useContext(DashboardContext);
+import { DashboardContext } from './dashboard-context';
 
 // ─── Navigation Items ────────────────────────────────────────────────────────
 

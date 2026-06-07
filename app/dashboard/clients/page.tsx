@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { useDashboard } from '../layout';
+import { useDashboard } from '../dashboard-context';
 import { useClients, useDocuments, formatRelativeTime, formatCurrency } from '@/hooks/use-dashboard-data';
 import type { DocumentFilters } from '@/hooks/use-dashboard-data';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
@@ -191,7 +191,7 @@ function AddClientModal({ firmId, onClose, onSuccess }: { firmId: string; onClos
     setError('');
     try {
       const supabase = getSupabase();
-      const { error: err } = await supabase.from('clients').insert([{ client_name: name.trim(), ca_firm_id: firmId, created_at: new Date().toISOString() }]);
+      const { error: err } = await supabase.from('clients').insert([{ trade_name: name.trim(), ca_firm_id: firmId }]);
       if (err) throw err;
       onSuccess();
     } catch (e: any) {

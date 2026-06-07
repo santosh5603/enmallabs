@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useDashboard } from '../layout';
+import { useDashboard } from '../dashboard-context';
 import { useChatLogs, formatRelativeTime } from '@/hooks/use-dashboard-data';
 import type { ChatLogRecord } from '@/hooks/use-dashboard-data';
 import { getSupabase } from '@/lib/supabase';

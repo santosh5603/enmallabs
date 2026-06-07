@@ -14,9 +14,12 @@ interface DocumentDetailModalProps {
 export function DocumentDetailModal({ document: doc, onClose }: DocumentDetailModalProps) {
   if (!doc) return null;
 
-  const extracted = doc.extracted_data?.invoice || doc.extracted_data;
+  const extracted = doc.extraction_data?.invoice || doc.extraction_data || {};
   const lineItems = extracted?.line_items || [];
   const taxSlabs = extracted?.tax_slabs || [];
+  const itcEligible = extracted?.itc_eligible ?? null;
+  const processingError = extracted?.processing_error || null;
+
 
   return (
     <AnimatePresence>
@@ -81,16 +84,16 @@ export function DocumentDetailModal({ document: doc, onClose }: DocumentDetailMo
               </div>
 
               {/* ITC Eligibility */}
-              {doc.itc_eligible !== null && (
-                <div className={`p-4 rounded-2xl border ${doc.itc_eligible ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
+              {itcEligible !== null && (
+                <div className={`p-4 rounded-2xl border ${itcEligible ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
                   <div className="flex items-center gap-2 mb-1">
-                    {doc.itc_eligible ? (
+                    {itcEligible ? (
                       <Shield className="w-4 h-4 text-emerald-400" />
                     ) : (
                       <AlertTriangle className="w-4 h-4 text-red-400" />
                     )}
-                    <span className={`text-xs font-bold uppercase tracking-wider ${doc.itc_eligible ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {doc.itc_eligible ? 'ITC Eligible' : 'ITC Not Eligible'}
+                    <span className={`text-xs font-bold uppercase tracking-wider ${itcEligible ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {itcEligible ? 'ITC Eligible' : 'ITC Not Eligible'}
                     </span>
                   </div>
                   {extracted?.itc_reason && (
@@ -160,13 +163,13 @@ export function DocumentDetailModal({ document: doc, onClose }: DocumentDetailMo
               )}
 
               {/* Processing Error */}
-              {doc.processing_error && (
+              {processingError && (
                 <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/20">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="w-4 h-4 text-red-400" />
                     <span className="text-xs font-bold text-red-400 uppercase tracking-wider">Processing Error</span>
                   </div>
-                  <p className="text-xs text-white/50">{doc.processing_error}</p>
+                  <p className="text-xs text-white/50">{processingError}</p>
                 </div>
               )}
             </div>
