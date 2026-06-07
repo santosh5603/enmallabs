@@ -79,7 +79,7 @@ export default function LandingPage() {
 
               <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row items-center gap-8 mb-24">
                 <GlassButton
-                  href="/login"
+                  href="/signin"
                   variant="primary"
                   className="px-8 py-4 text-[14px]"
                 >
@@ -507,7 +507,7 @@ export default function LandingPage() {
                   <li className="flex items-center gap-4"><Check className="w-4 h-4 text-accent" /> Core Telegram processing</li>
                   <li className="flex items-center gap-4"><Check className="w-4 h-4 text-accent" /> Basic DPA logging</li>
                 </ul>
-                <GlassButton href="/login" variant="primary" className="block w-full text-center px-6 py-4 text-[13px]">
+                <GlassButton href="/signin" variant="primary" className="block w-full text-center px-6 py-4 text-[13px]">
                   Get Started Free
                 </GlassButton>
               </motion.div>
@@ -531,7 +531,7 @@ export default function LandingPage() {
                   <li className="flex items-center gap-4"><Check className="w-4 h-4 text-accent" /> Priority support</li>
                   <li className="flex items-center gap-4"><Check className="w-4 h-4 text-accent" /> All features included</li>
                 </ul>
-                <GlassButton href="/login" variant="white" className="block w-full text-center px-6 py-4 text-[13px]">
+                <GlassButton href="/signin" variant="white" className="block w-full text-center px-6 py-4 text-[13px]">
                   Start Free Trial
                 </GlassButton>
               </motion.div>
@@ -594,7 +594,7 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6 relative z-10">
                 <GlassButton
-                  href="/login"
+                  href="/signin"
                   variant="white"
                   className="px-10 py-5 text-[14px]"
                 >

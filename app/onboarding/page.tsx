@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Check, Loader2, Building2, User, Phone, Shield } from 'lucide-react';
+import { Check, Loader2, Building2, User, Phone, Shield, Lock } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -17,6 +17,8 @@ export default function OnboardingPage() {
   const [dpaAgreed, setDpaAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [dataTrainingConsent, setDataTrainingConsent] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [formData, setFormData] = useState({
     firmName: '',
@@ -57,10 +59,28 @@ export default function OnboardingPage() {
     e.preventDefault();
     if (!user) return;
     setError('');
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const supabase = getSupabase();
+
+      // Update the user's password credential in Supabase Auth
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (passwordError) throw passwordError;
 
       // Check if a ca_firms row already exists for this user
       const { data: existingFirm } = await supabase
@@ -225,6 +245,34 @@ export default function OnboardingPage() {
                   required
                   value={formData.phone}
                   onChange={handleChange}
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-4 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                <input
+                  type="password"
+                  placeholder="Create Login Password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-4 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                <input
+                  type="password"
+                  placeholder="Confirm Login Password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-4 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
                 />
               </div>

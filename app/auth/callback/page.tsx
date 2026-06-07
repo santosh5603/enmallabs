@@ -25,6 +25,7 @@ export default function AuthCallbackPage() {
       // Also check query params for PKCE code flow
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
+      const next = urlParams.get('next');
 
       try {
         if (accessToken && refreshToken) {
@@ -49,6 +50,12 @@ export default function AuthCallbackPage() {
 
         if (!user) {
           throw new Error('No user found after authentication');
+        }
+
+        // Handle password recovery flow
+        if (next === '/reset-password') {
+          router.replace('/reset-password');
+          return;
         }
 
         // Check if onboarding is completed

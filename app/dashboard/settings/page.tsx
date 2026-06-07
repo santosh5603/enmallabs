@@ -8,6 +8,7 @@ import {
   Building2, User, Mail, Phone, Shield, Send, CheckCircle2,
   Clock, AlertCircle, Save, Loader2, ExternalLink,
 } from 'lucide-react';
+import { GlassButton } from '@/components/GlassButton';
 
 export default function SettingsPage() {
   const { firmData, firmLoading, user } = useDashboard();
@@ -19,6 +20,45 @@ export default function SettingsPage() {
     ca_name: '',
     phone: '',
   });
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess(false);
+
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw error;
+      setPasswordSuccess(true);
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (err: any) {
+      setPasswordError(err.message || 'Failed to update password.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const startEditing = () => {
     setFormData({
@@ -288,6 +328,75 @@ export default function SettingsPage() {
               </div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Security & Password */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="glass-card rounded-[24px] p-8"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-accent" />
+            </div>
+            <h2 className="font-serif text-xl font-medium">Security & Password</h2>
+          </div>
+
+          {passwordSuccess && (
+            <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>Password updated successfully.</span>
+            </div>
+          )}
+
+          {passwordError && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{passwordError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleChangePassword} className="space-y-5">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">New Password</label>
+              <input
+                type="password"
+                placeholder="Enter new password (min 8 chars)"
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm px-4 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">Confirm New Password</label>
+              <input
+                type="password"
+                placeholder="Confirm new password"
+                required
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm px-4 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+              />
+            </div>
+            <GlassButton
+              type="submit"
+              variant="white"
+              className="px-6 py-3"
+              disabled={passwordLoading || !newPassword || !confirmNewPassword}
+            >
+              {passwordLoading ? (
+                <span className="flex items-center gap-2 justify-center">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Updating...
+                </span>
+              ) : (
+                'Update Password'
+              )}
+            </GlassButton>
+          </form>
         </motion.div>
       </div>
     </div>
