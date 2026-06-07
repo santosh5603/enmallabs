@@ -2,8 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useAuth } from '@/lib/auth-context';
 import { useFirmData, type FirmData } from '@/hooks/use-dashboard-data';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,27 +57,31 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { user, loading: authLoading, signOut } = useAuth();
   const [globalSearch, setGlobalSearch] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        router.push('/login');
-      }
-      setAuthLoading(false);
-    });
-    return () => unsubscribe();
-  }, [router]);
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
 
-  const { firmData, loading: firmLoading } = useFirmData(user?.uid || null);
+  const { firmData, loading: firmLoading } = useFirmData(user?.id || null);
+
+  // Redirect to onboarding if profile is not complete
+  useEffect(() => {
+    if (!firmLoading && user && firmData === null) {
+      // No firm data found — need onboarding
+      router.push('/onboarding');
+    } else if (!firmLoading && firmData && !firmData.onboarding_completed) {
+      router.push('/onboarding');
+    }
+  }, [firmData, firmLoading, user, router]);
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    await signOut();
     router.push('/');
   };
 

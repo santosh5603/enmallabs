@@ -79,6 +79,7 @@ export interface DocumentFilters {
 
 export interface FirmData {
   id: string;
+  supabase_user_id: string | null;
   firebase_uid: string | null;
   firm_name: string;
   ca_name: string;
@@ -91,6 +92,7 @@ export interface FirmData {
   onboarding_completed: boolean;
   dpa_consented: boolean;
   dpa_consented_at: string | null;
+  data_training_consent: boolean;
   created_at: string;
   updated_at: string | null;
   known_groups: any;
@@ -98,14 +100,14 @@ export interface FirmData {
 
 // ─── useFirmData ─────────────────────────────────────────────────────────────
 
-export function useFirmData(firebaseUid: string | null) {
+export function useFirmData(supabaseUserId: string | null) {
   const [firmData, setFirmData] = useState<FirmData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
   useEffect(() => {
-    if (!firebaseUid) {
+    if (!supabaseUserId) {
       setLoading(false);
       return;
     }
@@ -117,7 +119,7 @@ export function useFirmData(firebaseUid: string | null) {
       const { data, error: err } = await supabase
         .from('ca_firms')
         .select('*')
-        .eq('firebase_uid', firebaseUid)
+        .eq('supabase_user_id', supabaseUserId)
         .single();
 
       if (err) {
@@ -132,14 +134,14 @@ export function useFirmData(firebaseUid: string | null) {
 
     // Realtime subscription
     channelRef.current = supabase
-      .channel(`firm-${firebaseUid}`)
+      .channel(`firm-${supabaseUserId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'ca_firms',
-          filter: `firebase_uid=eq.${firebaseUid}`,
+          filter: `supabase_user_id=eq.${supabaseUserId}`,
         },
         (payload) => {
           if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
@@ -152,7 +154,7 @@ export function useFirmData(firebaseUid: string | null) {
     return () => {
       channelRef.current?.unsubscribe();
     };
-  }, [firebaseUid]);
+  }, [supabaseUserId]);
 
   return { firmData, loading, error };
 }

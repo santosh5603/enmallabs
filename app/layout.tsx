@@ -1,7 +1,7 @@
 import type {Metadata} from 'next';
 import { Inter, Cormorant_Garamond } from 'next/font/google';
 import './globals.css'; // Global styles
-import SmoothScroll from '../components/SmoothScroll';
+import { AuthProvider } from '@/lib/auth-context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,8 +23,11 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en" className={`${inter.variable} ${cormorantGaramond.variable} bg-black`}>
       <body className="font-sans antialiased text-white selection:bg-accent/30" suppressHydrationWarning>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
