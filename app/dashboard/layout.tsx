@@ -174,7 +174,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             {/* Telegram Status */}
             {firmData?.telegram_chat_id && (
               <a
-                href="https://t.me/enma12bot"
+                href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#229ED9]/60 hover:text-[#229ED9] hover:bg-[#229ED9]/5 transition-all duration-200 mb-2"

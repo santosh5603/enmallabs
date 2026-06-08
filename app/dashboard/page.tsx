@@ -57,7 +57,7 @@ export default function DashboardOverview() {
                   <Step num="3" text="Enma will automatically extract data and show it here" done={false} />
                 </div>
                 {!firmData?.telegram_chat_id && (
-                  <a href="https://t.me/enma12bot" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 rounded-full bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-sm font-bold hover:bg-[#229ED9]/20 transition-all">
+                  <a href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 rounded-full bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-sm font-bold hover:bg-[#229ED9]/20 transition-all">
                     <Send className="w-4 h-4" />Connect Telegram
                   </a>
                 )}
@@ -147,7 +147,7 @@ export default function DashboardOverview() {
                   <div className="flex justify-between text-xs"><span className="text-white/40">Failed</span><span className={stats.failedDocuments > 0 ? 'text-red-400' : 'text-white/80'}>{stats.failedDocuments}</span></div>
                 </div>
               )}
-              <a href="https://t.me/enma12bot" target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-xs font-bold hover:bg-[#229ED9]/20 transition-all">
+              <a href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-xs font-bold hover:bg-[#229ED9]/20 transition-all">
                 <Send className="w-3.5 h-3.5" />{firmData?.telegram_chat_id ? 'Open Bot' : 'Connect Telegram'}
               </a>
             </div>

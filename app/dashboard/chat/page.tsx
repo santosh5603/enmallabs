@@ -149,7 +149,7 @@ export default function ChatPage() {
             <Search className="w-5 h-5" />
           </button>
           <a
-            href="https://t.me/enma12bot"
+            href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-xs font-bold hover:bg-[#229ED9]/20 transition-all"

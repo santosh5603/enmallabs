@@ -113,7 +113,7 @@ export default function DocumentsPage() {
               Forward any invoice, bill, or bank statement to the Enma Telegram bot. The AI will automatically extract data and categorize the document.
             </p>
             <a
-              href="https://t.me/enma12bot"
+              href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-sm font-bold hover:bg-[#229ED9]/20 transition-all"
