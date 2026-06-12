@@ -49,10 +49,10 @@ export default function ChatPage() {
 
   const filteredLogs = searchQuery
     ? sortedLogs.filter(
-        (log) =>
-          log.user_message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          log.bot_response.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (log) =>
+        log.user_message.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        log.bot_response.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : sortedLogs;
 
   // Group messages by date
@@ -88,11 +88,11 @@ export default function ChatPage() {
       if (!res.ok) {
         throw new Error('Failed to sync message with backend');
       }
-      
+
       // The FastAPI backend will process this webhook, send the reply to Telegram via its Bot Token,
       // and log both the user message and bot response to Supabase. 
       // Because we use Supabase Realtime in useChatLogs, the UI will automatically update!
-      
+
     } catch (err) {
       console.error('Failed to send message:', err);
     } finally {
@@ -205,8 +205,8 @@ export default function ChatPage() {
                 searchQuery
                   ? 'Try adjusting your search query.'
                   : firmData?.telegram_chat_id
-                  ? 'Start chatting with Enma on Telegram or send a message below. Your conversations will sync here in real-time.'
-                  : 'Connect your Telegram account to start chatting with Enma AI. All conversations will appear here.'
+                    ? 'Start chatting with Enma on Telegram or send a message below. Your conversations will sync here in real-time.'
+                    : 'Connect your Telegram account to start chatting with Enma AI. All conversations will appear here.'
               }
             />
           </div>

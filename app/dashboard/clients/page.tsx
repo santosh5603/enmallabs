@@ -49,9 +49,11 @@ export default function ClientsPage() {
 
       {clients.length > 0 && (
         <FilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search clients by name..."
-          filters={[{ key: 'sort', label: 'Sort By', options: [
-            { value: 'docs', label: 'Most Documents' }, { value: 'amount', label: 'Highest Value' }, { value: 'recent', label: 'Most Recent' },
-          ], value: sortBy, onChange: setSortBy }]} resultCount={filteredClients.length}
+          filters={[{
+            key: 'sort', label: 'Sort By', options: [
+              { value: 'docs', label: 'Most Documents' }, { value: 'amount', label: 'Highest Value' }, { value: 'recent', label: 'Most Recent' },
+            ], value: sortBy, onChange: setSortBy
+          }]} resultCount={filteredClients.length}
         />
       )}
 

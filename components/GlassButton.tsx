@@ -14,17 +14,17 @@ interface GlassButtonProps {
   disabled?: boolean;
 }
 
-export function GlassButton({ 
-  href, 
-  onClick, 
-  children, 
-  className = '', 
+export function GlassButton({
+  href,
+  onClick,
+  children,
+  className = '',
   variant = 'primary',
   type = 'button',
   disabled = false
 }: GlassButtonProps) {
   const baseStyles = "relative px-6 py-3 rounded-full font-bold text-[13px] transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
-  
+
   const variants = {
     primary: "bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 hover:border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.05)]",
     secondary: "bg-black/20 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-black/40 hover:border-white/20",
@@ -48,10 +48,10 @@ export function GlassButton({
     const isExternal = href.startsWith('http') || href.startsWith('mailto:');
     if (isExternal) {
       element = (
-        <a 
-          href={href} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
           className={`${baseStyles} ${variants[variant]} ${className}`}
         >
           {content}
@@ -66,9 +66,9 @@ export function GlassButton({
     }
   } else {
     element = (
-      <button 
+      <button
         type={type}
-        onClick={onClick} 
+        onClick={onClick}
         disabled={disabled}
         className={`${baseStyles} ${variants[variant]} ${className}`}
       >

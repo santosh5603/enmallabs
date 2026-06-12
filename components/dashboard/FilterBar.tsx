@@ -66,9 +66,8 @@ function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps
               <button
                 key={option.value}
                 onClick={() => { onChange(option.value); setOpen(false); }}
-                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${
-                  value === option.value ? 'text-accent bg-accent/5' : 'text-white/50 hover:text-white hover:bg-white/5'
-                }`}
+                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${value === option.value ? 'text-accent bg-accent/5' : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`}
               >
                 <span>{option.label}</span>
                 {option.count !== undefined && (
