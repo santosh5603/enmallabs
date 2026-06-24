@@ -26,9 +26,9 @@ export function GlassButton({
   const baseStyles = "relative px-6 py-3 rounded-full font-bold text-[13px] transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-accent text-white hover:bg-accent-hover shadow-[0_4px_12px_rgba(0,117,222,0.15)]",
+    primary: "bg-[#0075de] text-white hover:bg-[#005bb5] shadow-[0_4px_12px_rgba(0,117,222,0.15)]",
     secondary: "bg-black/[0.04] border border-black/5 text-[#31302e] hover:bg-black/[0.08]",
-    accent: "bg-accent/10 border border-accent/25 text-accent hover:bg-accent/20",
+    accent: "bg-[#0075de]/10 border border-[#0075de]/25 text-[#0075de] hover:bg-[#0075de]/20",
     white: "bg-white border border-[#e6e6e6] text-black hover:bg-gray-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
   };
 

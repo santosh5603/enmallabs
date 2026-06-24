@@ -20,50 +20,52 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-[#e6e6e6] px-6">
-      <div className="max-w-6xl mx-auto flex items-center justify-between py-3.5">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/enma-logo.svg" alt="Enma" width={28} height={28} className="rounded-lg"/>
-          <span className="font-bold text-[17px] text-black tracking-tight">Enma</span>
-        </Link>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          {['Features', 'Security', 'How It Works'].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase().replace(/ /g, '-')}`}
-              className="text-[14px] font-medium text-[#31302e] hover:text-accent transition-colors"
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-
-        <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/login"
-            className="text-[14px] font-medium text-[#31302e] hover:text-black transition-colors px-4"
-          >
-            Log in
+    <>
+      <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-[#e6e6e6] px-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between py-3.5">
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/enma-logo.svg" alt="Enma" width={28} height={28} className="rounded-lg"/>
+            <span className="font-bold text-[17px] text-black tracking-tight">Enma</span>
           </Link>
-          <GlassButton
-            href="/signin"
-            variant="white"
-            className="px-5 py-2 border-[#e6e6e6] hover:border-black/20"
-          >
-            Get Enma free
-          </GlassButton>
-        </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden text-black/60 hover:text-black"
-          onClick={() => setMobileMenuOpen(true)}
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-      </div>
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-6">
+            {['Features', 'Security', 'How It Works'].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase().replace(/ /g, '-')}`}
+                className="text-[14px] font-medium text-[#31302e] hover:text-accent transition-colors"
+              >
+                {item}
+              </a>
+            ))}
+          </nav>
+
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/login"
+              className="text-[14px] font-medium text-[#31302e] hover:text-black transition-colors px-4"
+            >
+              Log in
+            </Link>
+            <GlassButton
+              href="/signin"
+              variant="white"
+              className="px-5 py-2 border-[#e6e6e6] hover:border-black/20"
+            >
+              Get Enma free
+            </GlassButton>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden text-black/60 hover:text-black"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
       {/* Mobile Drawer */}
       <AnimatePresence>
@@ -73,7 +75,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-[9000] md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
@@ -81,7 +83,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-[#f6f5f4] border-l border-[#e6e6e6] z-50 p-8 flex flex-col md:hidden"
+              className="fixed top-0 right-0 bottom-0 w-72 bg-[#f6f5f4] border-l border-[#e6e6e6] z-[9001] p-8 flex flex-col md:hidden"
             >
               <div className="flex justify-end mb-12">
                 <button
@@ -126,6 +128,6 @@ export default function Navbar() {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }

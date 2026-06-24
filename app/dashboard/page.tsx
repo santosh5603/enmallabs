@@ -32,16 +32,16 @@ export default function DashboardOverview() {
   return (
     <div>
       {/* Page Header */}
-      <div className="mb-8 flex justify-between items-end gap-6">
+      <div className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <div>
-          <h1 className="text-[40px] font-bold leading-tight text-black mb-2" style={{ letterSpacing: '-1px' }}>
+          <h1 className="text-3xl sm:text-[40px] font-bold leading-tight text-black mb-2" style={{ letterSpacing: '-1px' }}>
             {getGreeting()}, {firstName} 👋
           </h1>
           <p className="text-[16px] text-[#615d59] leading-relaxed">
             Here&apos;s what Enma handled for {firmData?.firm_name || 'your firm'} today.
           </p>
         </div>
-        <div className="flex items-center gap-2 px-3.5 py-2 bg-white border border-[#e6e6e6] rounded-full shadow-sm shrink-0">
+        <div className="flex items-center gap-2 px-3.5 py-2 bg-white border border-[#e6e6e6] rounded-full shadow-sm shrink-0 self-start sm:self-auto">
           <span className="inline-block w-2 h-2 rounded-full bg-[#1aae39] animate-pulse" />
           <span className="text-[13px] font-semibold text-black">Enma is live</span>
           {stats && stats.pendingDocuments > 0 && (
@@ -173,60 +173,62 @@ export default function DashboardOverview() {
                 ))}
               </div>
             ) : activities.length > 0 ? (
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-[#f6f5f4]">
-                    <th className="text-left px-6 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Item</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Client</th>
-                    <th className="text-right px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Amount</th>
-                    <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Status</th>
-                    <th className="text-right px-6 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">When</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activities.map((activity, i) => {
-                    const isDoc = activity.type === 'document';
-                    const bgColor = isDoc ? '#d6b6f6' : '#ff8fd6';
-                    const strokeColor = isDoc ? '#391c57' : '#5b1a3e';
-                    const amount = activity.metadata?.total_amount;
-                    const clientName = activity.metadata?.vendor_name || activity.metadata?.buyer_name || '—';
+              <div className="w-full overflow-x-auto">
+                <table className="w-full border-collapse min-w-[650px]">
+                  <thead>
+                    <tr className="bg-[#f6f5f4]">
+                      <th className="text-left px-6 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Item</th>
+                      <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Client</th>
+                      <th className="text-right px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Amount</th>
+                      <th className="text-left px-4 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">Status</th>
+                      <th className="text-right px-6 py-2.5 text-[11px] font-semibold tracking-[0.5px] uppercase text-[#615d59]">When</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activities.map((activity, i) => {
+                      const isDoc = activity.type === 'document';
+                      const bgColor = isDoc ? '#d6b6f6' : '#ff8fd6';
+                      const strokeColor = isDoc ? '#391c57' : '#5b1a3e';
+                      const amount = activity.metadata?.total_amount;
+                      const clientName = activity.metadata?.vendor_name || activity.metadata?.buyer_name || '—';
 
-                    return (
-                      <motion.tr
-                        key={activity.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="border-t border-[#e6e6e6] hover:bg-[#fafaf9] transition-colors"
-                      >
-                        <td className="px-6 py-3.5">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: bgColor }}>
-                              {isDoc ? (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
-                              ) : (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                              )}
+                      return (
+                        <motion.tr
+                          key={activity.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="border-t border-[#e6e6e6] hover:bg-[#fafaf9] transition-colors"
+                        >
+                          <td className="px-6 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: bgColor }}>
+                                {isDoc ? (
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                                ) : (
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[14px] text-black font-medium truncate max-w-[200px]">{activity.title}</div>
+                                <div className="text-[12px] text-[#615d59] truncate">{activity.description}</div>
+                              </div>
                             </div>
-                            <div className="min-w-0">
-                              <div className="text-[14px] text-black font-medium truncate max-w-[200px]">{activity.title}</div>
-                              <div className="text-[12px] text-[#615d59] truncate">{activity.description}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3.5 text-[14px] text-[#31302e]">{clientName}</td>
-                        <td className="px-4 py-3.5 text-[14px] text-right font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {amount ? formatCurrency(amount) : '—'}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <StatusBadge status={activity.status} />
-                        </td>
-                        <td className="px-6 py-3.5 text-[13px] text-[#615d59] text-right">{formatRelativeTime(activity.timestamp)}</td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                          <td className="px-4 py-3.5 text-[14px] text-[#31302e]">{clientName}</td>
+                          <td className="px-4 py-3.5 text-[14px] text-right font-semibold" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            {amount ? formatCurrency(amount) : '—'}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            <StatusBadge status={activity.status} />
+                          </td>
+                          <td className="px-6 py-3.5 text-[13px] text-[#615d59] text-right">{formatRelativeTime(activity.timestamp)}</td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="p-12">
                 <EmptyState icon={Clock} title="No Activity Yet" description="Activity will appear here as you process documents." />

@@ -162,7 +162,7 @@ function ClientDetailView({ clientName, clientId, firmId, onBack }: { clientName
         <div className="bg-white border border-[#e6e6e6] rounded-[20px] overflow-hidden shadow-sm">
           <div className="divide-y divide-[#e6e6e6]">
             {documents.map((doc, i) => (
-              <div key={doc.id} onClick={() => setSelectedDoc(doc)} className="px-6 py-4 flex items-center justify-between hover:bg-black/[0.01] transition-all cursor-pointer group">
+              <div key={doc.id} onClick={() => setSelectedDoc(doc)} className="px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-black/[0.01] transition-all cursor-pointer group">
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-[#0075de]/5 border border-[#0075de]/15 flex items-center justify-center shrink-0"><FileText className="w-5 h-5 text-[#0075de]" /></div>
                   <div className="min-w-0">
@@ -170,11 +170,15 @@ function ClientDetailView({ clientName, clientId, firmId, onBack }: { clientName
                     <p className="text-[11px] text-[#615d59]/70 mt-0.5">{formatRelativeTime(doc.created_at)}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 shrink-0">
-                  <StatusBadge status={doc.document_type || 'unknown'} />
-                  <StatusBadge status={doc.processing_status} />
-                  <span className="text-sm font-semibold text-black">{doc.total_amount ? formatCurrency(doc.total_amount) : '—'}</span>
-                  <Eye className="w-4 h-4 text-[#615d59]/30 group-hover:text-[#615d59]/70" />
+                <div className="flex items-center justify-between sm:justify-end gap-3 flex-wrap sm:shrink-0 w-full sm:w-auto border-t border-[#e6e6e6]/60 pt-3 sm:border-t-0 sm:pt-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <StatusBadge status={doc.document_type || 'unknown'} />
+                    <StatusBadge status={doc.processing_status} />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-black">{doc.total_amount ? formatCurrency(doc.total_amount) : '—'}</span>
+                    <Eye className="w-4 h-4 text-[#615d59]/30 group-hover:text-[#615d59]/70" />
+                  </div>
                 </div>
               </div>
             ))}

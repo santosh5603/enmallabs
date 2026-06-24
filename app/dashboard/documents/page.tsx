@@ -132,9 +132,9 @@ export default function DocumentsPage() {
         />
       ) : (
         /* Documents Table */
-        <div className="bg-white border border-[#e6e6e6] rounded-[20px] overflow-hidden shadow-sm">
+        <div className="w-full overflow-x-auto border border-[#e6e6e6] rounded-[20px] bg-white shadow-sm">
           {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-[#e6e6e6] text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70">
+          <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-[#e6e6e6] text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70 min-w-[768px]">
             <div className="col-span-3 flex items-center gap-1 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort('vendor_name')}>
               Vendor / File <ArrowUpDown className="w-3 h-3" />
             </div>
@@ -158,7 +158,7 @@ export default function DocumentsPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.02 }}
                 onClick={() => setSelectedDoc(doc)}
-                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-black/[0.01] transition-all cursor-pointer group"
+                className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-black/[0.01] transition-all cursor-pointer group min-w-[768px]"
               >
                 <div className="col-span-3 min-w-0">
                   <p className="text-sm font-semibold text-black truncate group-hover:text-[#0075de] transition-colors">

@@ -124,14 +124,14 @@ export default function AuditPage() {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-black mb-2" style={{ letterSpacing: '-0.75px' }}>Audit Log</h1>
           <p className="text-[#615d59] text-sm">System-logged compliance trail for all client document uploads, AI processing, and admin sessions.</p>
         </div>
         <button 
           onClick={handleRefresh}
-          className="flex items-center gap-1.5 px-4 py-2 bg-white border border-[#e6e6e6] rounded-full text-xs font-semibold text-black hover:bg-black/[0.04] transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 bg-white border border-[#e6e6e6] rounded-full text-xs font-semibold text-black hover:bg-black/[0.04] transition-all shrink-0"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Refresh trail
@@ -151,9 +151,9 @@ export default function AuditPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+        <div className="flex items-center gap-2 self-stretch sm:self-auto justify-start sm:justify-end flex-wrap">
           <span className="text-xs font-semibold text-[#615d59]">Category:</span>
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {['Security', 'Document', 'Client', 'Chat'].map(cat => (
               <button
                 key={cat}
@@ -184,8 +184,8 @@ export default function AuditPage() {
           <p className="text-xs text-[#615d59] max-w-sm mx-auto">Try adjusting your filters or search terms.</p>
         </div>
       ) : (
-        <div className="bg-white border border-[#e6e6e6] rounded-[20px] overflow-hidden shadow-sm">
-          <table className="w-full border-collapse">
+        <div className="w-full overflow-x-auto border border-[#e6e6e6] rounded-[20px] bg-white shadow-sm">
+          <table className="w-full border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-[#f6f5f4] text-left text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70 border-b border-[#e6e6e6]">
                 <th className="px-6 py-3">Timestamp</th>

@@ -106,11 +106,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       stats, statsLoading, clients, clientsLoading, refetchClients,
     }}>
       <div
-        className="min-h-screen bg-[#f6f5f4] text-black font-sans overflow-hidden h-screen selection:bg-[#0075de]/20"
+        className="min-h-screen bg-[#f6f5f4] text-black font-sans overflow-hidden h-screen selection:bg-[#0075de]/20 grid grid-cols-1 lg:grid-cols-[248px_1fr] transition-[grid-template-columns] duration-300 ease-in-out"
         style={{
-          display: 'grid',
-          gridTemplateColumns: sidebarCollapsed ? '0px 1fr' : '248px 1fr',
-          transition: 'grid-template-columns 0.26s ease',
+          gridTemplateColumns: sidebarCollapsed ? '0px 1fr' : undefined,
         }}
       >
         {/* Mobile Sidebar Overlay */}
@@ -128,26 +126,42 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Sidebar */}
         <aside
-          className="bg-[#f6f5f4] border-r border-[#e6e6e6] flex flex-col overflow-hidden min-w-0"
+          className={`
+            bg-[#f6f5f4] border-r border-[#e6e6e6] flex flex-col overflow-hidden min-w-0
+            fixed top-0 left-0 bottom-0 z-50 w-72 transition-transform duration-300 ease-in-out
+            lg:static lg:w-auto lg:z-0 lg:shadow-none lg:translate-x-0
+            ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
+          `}
           style={{ padding: sidebarCollapsed ? '0' : '18px 14px' }}
         >
           {/* Workspace Switcher Header */}
-          <Link href="/dashboard" className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-black/[0.04] transition-colors mb-2">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#0075de] text-white font-extrabold text-[14px] shrink-0">
-              {getWorkspaceInitials()}
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="text-[14px] font-semibold text-black truncate">
-                {firmData?.firm_name || 'Sharma & Co'}
+          <div className="flex items-center justify-between mb-2">
+            <Link href="/dashboard" className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-black/[0.04] transition-colors flex-grow min-w-0">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#0075de] text-white font-extrabold text-[14px] shrink-0">
+                {getWorkspaceInitials()}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[14px] font-semibold text-black truncate">
+                  {firmData?.firm_name || 'Sharma & Co'}
+                </div>
+                <div className="text-[12px] text-[#615d59]">
+                  {firmData?.subscription_plan === 'trial' ? 'Professional trial' : 'Professional plan'}
+                </div>
               </div>
-              <div className="text-[12px] text-[#615d59]">
-                {firmData?.subscription_plan === 'trial' ? 'Professional trial' : 'Professional plan'}
-              </div>
-            </div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#615d59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </Link>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#615d59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 ml-1">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </Link>
+            
+            {/* Mobile close button */}
+            <button 
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-lg text-[#615d59] hover:text-black hover:bg-black/[0.04] ml-1 shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
 
           {/* Sidebar Search */}
           <div className="flex items-center gap-2 px-2.5 py-[7px] bg-black/[0.04] rounded-[5px] mb-2.5">
@@ -282,16 +296,16 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Main Content Area */}
         <main className="flex flex-col overflow-hidden relative bg-[#f6f5f4]" style={{ padding: 0 }}>
           {/* Top Header */}
-          <header className="sticky top-0 z-10 border-b border-[#e6e6e6] flex items-center justify-between px-8 py-[14px] shrink-0"
+          <header className="sticky top-0 z-10 border-b border-[#e6e6e6] flex items-center justify-between px-4 md:px-8 py-[14px] shrink-0"
             style={{ background: 'rgba(246,245,244,0.85)', backdropFilter: 'saturate(180%) blur(12px)' }}
           >
             {/* Left: Toggle + Breadcrumb */}
-            <div className="flex items-center gap-1.5 text-[13px] text-[#615d59]">
+            <div className="flex items-center gap-1.5 text-[13px] text-[#615d59] min-w-0">
               {/* Sidebar Toggle Button */}
               <button
                 onClick={() => setSidebarCollapsed(prev => !prev)}
                 title="Toggle sidebar"
-                className="w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] inline-flex items-center justify-center text-[#615d59] shrink-0 mr-1 cursor-pointer hover:bg-[#f6f5f4] transition-colors"
+                className="hidden lg:inline-flex w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] items-center justify-center text-[#615d59] shrink-0 mr-1 cursor-pointer hover:bg-[#f6f5f4] transition-colors"
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -302,7 +316,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               {/* Mobile menu toggle */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] inline-flex items-center justify-center text-[#615d59]"
+                className="lg:hidden w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] inline-flex items-center justify-center text-[#615d59] shrink-0 mr-1"
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <line x1="3" y1="12" x2="21" y2="12" />
@@ -311,29 +325,29 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 </svg>
               </button>
 
-              <span>{firmData?.firm_name || 'Sharma & Co'}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a39e98" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-              <span className="text-black font-medium capitalize">{getActiveNav()}</span>
+              <span className="truncate hidden sm:inline">{firmData?.firm_name || 'Sharma & Co'}</span>
+              <svg className="hidden sm:inline" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a39e98" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+              <span className="text-black font-medium capitalize truncate">{getActiveNav()}</span>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2">
-              <button className="py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] inline-flex items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <button className="hidden sm:inline-flex py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#31302e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                 {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </button>
-              <button className="py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] inline-flex items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
+              <button className="hidden sm:inline-flex py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#31302e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                 Export
               </button>
               <Link
                 href="/dashboard/clients"
-                className="py-[9px] px-4 bg-[#0075de] text-white rounded-full text-[14px] font-medium inline-flex items-center gap-1.5 hover:bg-[#005bb5] transition-colors"
+                className="py-[9px] px-3 sm:px-4 bg-[#0075de] text-white rounded-full text-[14px] font-medium inline-flex items-center gap-1.5 hover:bg-[#005bb5] transition-colors"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                Add client
+                <span className="hidden sm:inline">Add client</span>
               </Link>
-              <div className="ml-2 w-8 h-8 rounded-full bg-gradient-to-br from-[#ff64c8] to-[#d6b6f6] text-white flex items-center justify-center font-bold text-[13px] cursor-pointer select-none">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff64c8] to-[#d6b6f6] text-white flex items-center justify-center font-bold text-[13px] cursor-pointer select-none">
                 {getWorkspaceInitials()}
               </div>
             </div>
