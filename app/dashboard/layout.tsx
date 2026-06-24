@@ -227,6 +227,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             <Link
               href="/dashboard/settings"
+              onClick={() => setSidebarOpen(false)}
               className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#31302e] hover:bg-black/[0.04] transition-colors"
             >
               <Settings className="w-4 h-4" strokeWidth={1.8} />
