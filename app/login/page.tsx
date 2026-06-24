@@ -275,13 +275,13 @@ function LoginContent() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 px-8 md:px-12 flex justify-between gap-4 text-xs text-[#615d59] bg-[#f6f5f4] border-t border-[#e6e6e6]/60 flex-wrap">
+      <footer className="py-6 px-8 md:px-12 flex justify-between gap-4 text-xs text-white/40 bg-gray-900 border-t border-white/10 flex-wrap">
         <span>© 2026 Enma Labs Pvt Ltd</span>
         <div className="flex gap-4.5">
-          <Link href="/terms" className="hover:underline">Terms</Link>
-          <Link href="/privacy" className="hover:underline">Privacy</Link>
-          <Link href="/dpa" className="hover:underline">DPA</Link>
-          <Link href="/status" className="hover:underline">Status</Link>
+          <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+          <Link href="/dpa" className="hover:text-white transition-colors">DPA</Link>
+          <Link href="/status" className="hover:text-white transition-colors">Status</Link>
         </div>
       </footer>
     </div>
