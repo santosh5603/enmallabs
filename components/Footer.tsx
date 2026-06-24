@@ -21,7 +21,7 @@ export default function Footer() {
           {/* Column 2 */}
           <div className="flex flex-col gap-4">
             <h4 className="text-black font-bold text-[11px] uppercase tracking-widest mb-4">Product</h4>
-            {['Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
+            {['Features', 'Security', 'How It Works'].map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase().replace(/ /g, '-')}`}

@@ -29,7 +29,7 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-          {['Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
+          {['Features', 'Security', 'How It Works'].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase().replace(/ /g, '-')}`}
@@ -92,7 +92,7 @@ export default function Navbar() {
                 </button>
               </div>
               <nav className="flex flex-col gap-6 mb-12">
-                {['Home', 'Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
+                {['Home', 'Features', 'Security', 'How It Works'].map((item) => (
                   <a
                     key={item}
                     href={item === 'Home' ? '/' : `#${item.toLowerCase().replace(/ /g, '-')}`}

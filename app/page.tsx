@@ -703,7 +703,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECTION 8 — PRICING */}
+        {/* SECTION 8 — PRICING COMING SOON */}
         <section id="pricing" className="py-24 md:py-32 bg-white">
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
@@ -711,130 +711,24 @@ export default function LandingPage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={staggerContainer}
-              className="text-center mb-20"
+              className="text-center"
             >
-              <motion.div variants={fadeUpVariant} className="mb-4">
+              <motion.div variants={fadeUpVariant} className="mb-5">
                 <span className="inline-block px-3 py-1 bg-[#f6f5f4] text-[#0075de] text-xs font-semibold tracking-wider rounded-full uppercase">
                   Pricing
                 </span>
               </motion.div>
-              <motion.h2 variants={fadeUpVariant} className="text-4xl md:text-5xl font-bold tracking-tight text-black">
-                Simple pricing for growing CA firms.
+              <motion.h2 variants={fadeUpVariant} className="text-4xl md:text-5xl font-bold tracking-tight text-black mb-4">
+                Pricing coming soon.
               </motion.h2>
-              <motion.p variants={fadeUpVariant} className="text-base md:text-lg text-[#615d59] max-w-xl mx-auto mt-4 leading-relaxed">
-                Start free. Upgrade when you outgrow it. Cancel anytime — no contracts, no commitment.
+              <motion.p variants={fadeUpVariant} className="text-base md:text-lg text-[#615d59] max-w-lg mx-auto leading-relaxed mb-10">
+                We&apos;re finalising our plans. Early access is free — sign up now and be the first to know when pricing goes live.
               </motion.p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
-              {/* Starter */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUpVariant}
-                className="bg-white border border-[#e6e6e6] rounded-2xl p-8 flex flex-col justify-between shadow-[0_4px_12px_rgba(0,0,0,0.01)]"
-              >
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold mb-1 text-black">Starter</h3>
-                    <p className="text-[#615d59] text-sm">For solo CAs testing the waters</p>
-                  </div>
-                  <div>
-                    <span className="text-5xl font-black text-black">₹0</span>
-                    <span className="text-[#615d59] text-sm ml-1">/ month</span>
-                  </div>
-                  <div className="h-px bg-[#e6e6e6]" />
-                  <ul className="space-y-3.5 text-sm text-[#31302e] font-medium">
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Up to 5 clients</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> 50 documents / month</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Core Telegram processing</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Basic DPA logging</li>
-                  </ul>
-                </div>
-                <GlassButton href="/signin" variant="white" className="w-full mt-8 border-[#e6e6e6] hover:border-black/20 text-black">
-                  Get started free
+              <motion.div variants={fadeUpVariant}>
+                <GlassButton href="/signin" variant="primary" className="px-8 py-3 text-[15px]">
+                  Get early access — it&apos;s free
                 </GlassButton>
               </motion.div>
-
-              {/* Professional */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUpVariant}
-                className="bg-[#f6f5f4] border border-[#e6e6e6] rounded-2xl p-8 flex flex-col justify-between relative shadow-[0_8px_32px_rgba(0,0,0,0.04)]"
-              >
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-accent text-white text-[9px] font-bold uppercase tracking-widest py-1.5 px-4 rounded-full">
-                  Most Popular
-                </div>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold mb-1 text-black">Professional</h3>
-                    <p className="text-[#615d59] text-sm">For mid‑sized firms running 50+ clients</p>
-                  </div>
-                  <div>
-                    <span className="text-5xl font-black text-black">₹4,999</span>
-                    <span className="text-[#615d59] text-sm ml-1">/ month</span>
-                  </div>
-                  <div className="h-px bg-[#e6e6e6]" />
-                  <ul className="space-y-3.5 text-sm text-[#31302e] font-medium">
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Unlimited clients</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Unlimited documents</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Full DPA audit trail</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> GST + bank reconciliation</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Priority support</li>
-                  </ul>
-                </div>
-                <GlassButton href="/signin" variant="primary" className="w-full mt-8">
-                  Start 14‑day free trial
-                </GlassButton>
-              </motion.div>
-
-              {/* Enterprise */}
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUpVariant}
-                className="bg-white border border-[#e6e6e6] rounded-2xl p-8 flex flex-col justify-between shadow-[0_4px_12px_rgba(0,0,0,0.01)]"
-              >
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-xl font-bold mb-1 text-black">Enterprise</h3>
-                    <p className="text-[#615d59] text-sm">For 100+ client firms &amp; offices</p>
-                  </div>
-                  <div>
-                    <span className="text-5xl font-black text-black">Custom</span>
-                  </div>
-                  <div className="h-px bg-[#e6e6e6]" />
-                  <ul className="space-y-3.5 text-sm text-[#31302e] font-medium">
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Everything in Professional</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Dedicated data isolation</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Custom SLA + 24/7 support</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> Custom integrations</li>
-                    <li className="flex items-center gap-3"><Check className="w-4 h-4 text-accent stroke-[3]" /> SOC2 reports on request</li>
-                  </ul>
-                </div>
-                <GlassButton href="/book-demo" variant="white" className="w-full mt-8 border-[#e6e6e6] hover:border-black/20 text-black">
-                  Contact sales
-                </GlassButton>
-              </motion.div>
-            </div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUpVariant}
-              className="text-center mt-12"
-            >
-              <p className="text-[#615d59] text-sm">
-                Not sure which plan fits?{' '}
-                <Link href="/book-demo" className="text-accent hover:underline font-semibold underline-offset-4">
-                  Book a free demo first.
-                </Link>
-              </p>
             </motion.div>
           </div>
         </section>
