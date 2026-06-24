@@ -3,7 +3,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { useFirmData } from '@/hooks/use-dashboard-data';
+import { useFirmData, useDashboardStats, useClients } from '@/hooks/use-dashboard-data';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -13,27 +13,17 @@ import {
   Users,
   FileText,
   Settings,
-  Bell,
   Search,
   TrendingUp,
   Send,
-  Menu,
   X,
   MessageCircle,
   HelpCircle,
   UserPlus,
+  BarChart3,
+  Shield,
 } from 'lucide-react';
 import { DashboardContext } from './dashboard-context';
-
-// ─── Navigation Items ────────────────────────────────────────────────────────
-
-const navItems = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-  { id: 'documents', label: 'Documents', icon: FileText, href: '/dashboard/documents', badge: '142' },
-  { id: 'clients', label: 'Clients', icon: Users, href: '/dashboard/clients', badge: '38' },
-  { id: 'chat', label: 'Chat with Enma', icon: MessageCircle, href: '/dashboard/chat', pulse: true },
-  { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
-];
 
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
@@ -43,6 +33,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading: authLoading, signOut } = useAuth();
   const [globalSearch, setGlobalSearch] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -52,11 +43,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [user, authLoading, router]);
 
   const { firmData, loading: firmLoading } = useFirmData(user?.id || null);
+  const { stats, loading: statsLoading } = useDashboardStats(firmData?.id || null);
+  const { clients, loading: clientsLoading, refetch: refetchClients } = useClients(firmData?.id || null);
+
+  // Real counts from data
+  const documentCount = stats?.totalDocuments ?? 0;
+  const clientCount = clients?.length ?? 0;
+  const chatCount = stats?.totalChatLogs ?? 0;
 
   // Redirect to onboarding if profile is not complete
   useEffect(() => {
     if (!firmLoading && user && firmData === null) {
-      // No firm data found — need onboarding
       router.push('/onboarding');
     } else if (!firmLoading && firmData && !firmData.onboarding_completed) {
       router.push('/onboarding');
@@ -92,9 +89,30 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     return firmData.firm_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
   };
 
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
+    { id: 'documents', label: 'Documents', icon: FileText, href: '/dashboard/documents', badge: documentCount > 0 ? String(documentCount) : undefined },
+    { id: 'clients', label: 'Clients', icon: Users, href: '/dashboard/clients', badge: clientCount > 0 ? String(clientCount) : undefined },
+    { id: 'chat', label: 'Chat with Enma', icon: MessageCircle, href: '/dashboard/chat', pulse: true },
+    { id: 'reports', label: 'Reports', icon: BarChart3, href: '/dashboard/reports' },
+    { id: 'audit', label: 'Audit log', icon: Shield, href: '/dashboard/audit' },
+  ];
+
   return (
-    <DashboardContext.Provider value={{ user, firmData, firmLoading, globalSearch, setGlobalSearch }}>
-      <div className="min-h-screen bg-[#f6f5f4] text-black font-sans flex overflow-hidden h-screen selection:bg-[#0075de]/20">
+    <DashboardContext.Provider value={{
+      user, firmData, firmLoading, globalSearch, setGlobalSearch,
+      sidebarCollapsed, setSidebarCollapsed,
+      documentCount, clientCount, chatCount,
+      stats, statsLoading, clients, clientsLoading, refetchClients,
+    }}>
+      <div
+        className="min-h-screen bg-[#f6f5f4] text-black font-sans overflow-hidden h-screen selection:bg-[#0075de]/20"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: sidebarCollapsed ? '0px 1fr' : '248px 1fr',
+          transition: 'grid-template-columns 0.26s ease',
+        }}
+      >
         {/* Mobile Sidebar Overlay */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -110,56 +128,48 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Sidebar */}
         <aside
-          className={`
-            fixed lg:static inset-y-0 left-0 z-50
-            w-64 border-r border-[#e6e6e6] bg-[#f6f5f4] flex flex-col shrink-0
-            transform transition-transform duration-300 ease-out
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          `}
+          className="bg-[#f6f5f4] border-r border-[#e6e6e6] flex flex-col overflow-hidden min-w-0"
+          style={{ padding: sidebarCollapsed ? '0' : '18px 14px' }}
         >
           {/* Workspace Switcher Header */}
-          <div className="p-4 pb-2">
-            <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-black/5 transition-colors cursor-pointer">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#0075de] text-white font-extrabold text-[14px]">
-                {getWorkspaceInitials()}
-              </span>
-              <div className="flex-1 min-w-0">
-                <div className="text-[14px] font-bold text-black truncate">
-                  {firmData?.firm_name || 'Sharma & Co'}
-                </div>
-                <div className="text-[12px] text-[#615d59]">
-                  {firmData?.subscription_plan === 'trial' ? 'Professional Trial' : 'Professional Plan'}
-                </div>
+          <Link href="/dashboard" className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-black/[0.04] transition-colors mb-2">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#0075de] text-white font-extrabold text-[14px] shrink-0">
+              {getWorkspaceInitials()}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-[14px] font-semibold text-black truncate">
+                {firmData?.firm_name || 'Sharma & Co'}
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#615d59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
+              <div className="text-[12px] text-[#615d59]">
+                {firmData?.subscription_plan === 'trial' ? 'Professional trial' : 'Professional plan'}
+              </div>
             </div>
-          </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#615d59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </Link>
 
           {/* Sidebar Search */}
-          <div className="px-4 mb-2.5">
-            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-black/[0.04] border border-transparent rounded-md transition-all focus-within:border-[#e6e6e6] focus-within:bg-white focus-within:shadow-sm">
-              <Search className="w-3.5 h-3.5 text-[#615d59] shrink-0" />
-              <input
-                type="text"
-                value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
-                placeholder="Search..."
-                className="bg-transparent border-none outline-none text-xs w-full text-black placeholder:text-[#a39e98]"
-              />
-              {globalSearch ? (
-                <button onClick={() => setGlobalSearch('')} className="text-[#a39e98] hover:text-black">
-                  <X className="w-3 h-3" />
-                </button>
-              ) : (
-                <span className="text-[10px] text-[#a39e98] bg-white border border-[#e6e6e6] px-1 py-0.5 rounded font-mono select-none">⌘K</span>
-              )}
-            </div>
+          <div className="flex items-center gap-2 px-2.5 py-[7px] bg-black/[0.04] rounded-[5px] mb-2.5">
+            <Search className="w-3.5 h-3.5 text-[#615d59] shrink-0" />
+            <input
+              type="text"
+              value={globalSearch}
+              onChange={(e) => setGlobalSearch(e.target.value)}
+              placeholder="Search"
+              className="bg-transparent border-none outline-none text-[13px] w-full text-black placeholder:text-[#a39e98]"
+            />
+            {globalSearch ? (
+              <button onClick={() => setGlobalSearch('')} className="text-[#a39e98] hover:text-black">
+                <X className="w-3 h-3" />
+              </button>
+            ) : (
+              <span className="text-[11px] text-[#a39e98] bg-white border border-[#e6e6e6] px-[5px] py-[1px] rounded-[3px] font-mono select-none shrink-0">⌘K</span>
+            )}
           </div>
 
           {/* Navigation Rows */}
-          <nav className="flex-1 px-2.5 space-y-0.5">
+          <nav className="flex-1 flex flex-col gap-[2px]">
             {navItems.map((item) => {
               const isActive = getActiveNav() === item.id;
               return (
@@ -168,21 +178,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={`
-                    relative w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors group
+                    relative w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] transition-colors
                     ${isActive
-                      ? 'bg-[#0075de]/8 text-black font-semibold'
-                      : 'text-[#31302e] hover:bg-black/5'
+                      ? 'bg-[rgba(0,117,222,0.08)]'
+                      : 'hover:bg-black/[0.04]'
                     }
                   `}
                 >
                   {isActive && (
-                    <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#0075de] rounded-r-md" />
+                    <span className="absolute -left-[14px] top-[6px] bottom-[6px] w-[3px] bg-[#0075de] rounded-r-[3px]" />
                   )}
-                  <item.icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-[#0075de] stroke-[2.2]' : 'text-[#31302e] stroke-[1.8]'}`} />
-                  <span className="text-sm">{item.label}</span>
+                  <item.icon
+                    className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#0075de]' : 'text-[#31302e]'}`}
+                    strokeWidth={isActive ? 2.2 : 1.8}
+                  />
+                  <span className={`text-[14px] ${isActive ? 'text-black font-semibold' : 'text-[#31302e]'}`}>{item.label}</span>
 
                   {item.badge && (
-                    <span className="ml-auto font-mono text-[11px] text-[#615d59] bg-white border border-[#e6e6e6] px-1.5 py-0.2 rounded-full font-bold">
+                    <span className="ml-auto text-[11px] text-[#615d59] bg-white border border-[#e6e6e6] px-1.5 rounded-full font-semibold">
                       {item.badge}
                     </span>
                   )}
@@ -194,49 +207,49 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               );
             })}
 
-            <div className="text-[11px] font-bold tracking-wider text-[#a39e98] uppercase px-3 pt-6 pb-2">
+            <div className="text-[11px] font-semibold tracking-[0.5px] text-[#a39e98] uppercase px-2.5 pt-[18px] pb-[6px]">
               Workspace
             </div>
 
             <Link
               href="/dashboard/settings"
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5"
+              className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#31302e] hover:bg-black/[0.04] transition-colors"
             >
-              <Settings className="w-4 h-4 stroke-[1.8]" />
-              <span className="text-sm">Settings</span>
+              <Settings className="w-4 h-4" strokeWidth={1.8} />
+              <span className="text-[14px]">Settings</span>
             </Link>
 
             <button
               onClick={() => alert('Teammate invitation is a premium feature.')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5 text-left cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#31302e] hover:bg-black/[0.04] transition-colors text-left cursor-pointer"
             >
-              <UserPlus className="w-4 h-4 stroke-[1.8]" />
-              <span className="text-sm">Invite teammate</span>
+              <UserPlus className="w-4 h-4" strokeWidth={1.8} />
+              <span className="text-[14px]">Invite teammate</span>
             </button>
 
             <button
               onClick={() => alert('Support tickets can be filed in Chat widget.')}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5 text-left cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#31302e] hover:bg-black/[0.04] transition-colors text-left cursor-pointer"
             >
-              <HelpCircle className="w-4 h-4 stroke-[1.8]" />
-              <span className="text-sm">Help & support</span>
+              <HelpCircle className="w-4 h-4" strokeWidth={1.8} />
+              <span className="text-[14px]">Help & support</span>
             </button>
           </nav>
 
           {/* Bottom Panel */}
-          <div className="p-4 mt-auto border-t border-[#e6e6e6]">
+          <div className="mt-auto pt-[14px] px-2.5 pb-[6px] border-t border-[#e6e6e6]">
             {/* Upgrade Nudge */}
-            <div className="bg-white border border-[#e6e6e6] rounded-xl p-3.5 mb-3.5 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#d6b6f6] to-[#b48be0] flex items-center justify-center">
+            <div className="bg-white border border-[#e6e6e6] rounded-lg p-3.5 mb-3 flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#d6b6f6] to-[#b48be0] flex items-center justify-center shrink-0">
                   <TrendingUp className="w-3.5 h-3.5 text-[#391c57]" />
                 </div>
-                <span className="text-xs font-bold text-black">142 / unlimited</span>
+                <span className="text-[13px] font-semibold text-black">{documentCount} / unlimited</span>
               </div>
-              <div className="h-1 bg-[#f6f5f4] rounded-full overflow-hidden mb-2">
-                <div className="h-full w-[62%] bg-[#0075de] rounded-full" />
+              <div className="h-1 bg-[#f6f5f4] rounded-full overflow-hidden">
+                <div className="h-full bg-[#0075de] rounded-full" style={{ width: `${Math.min(documentCount * 2, 100)}%` }} />
               </div>
-              <p className="text-[11px] text-[#615d59] leading-relaxed">
+              <p className="text-[11px] text-[#615d59] leading-[1.4]">
                 Docs processed this month. {firmData?.subscription_plan === 'trial' ? 'Free trial' : 'Pro plan'} resets in 13 days.
               </p>
             </div>
@@ -247,7 +260,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 href={`https://t.me/enma12bot?start=${firmData.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#229ED9] hover:bg-[#229ED9]/5 transition-colors mb-2 text-xs font-medium"
+                className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#229ED9] hover:bg-[#229ED9]/5 transition-colors mb-1 text-[13px] font-medium"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Telegram Bot</span>
@@ -258,49 +271,69 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             {/* Sign Out */}
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:text-red-600 hover:bg-red-500/5 transition-colors cursor-pointer text-left"
+              className="w-full flex items-center gap-2.5 px-2.5 py-[7px] rounded-[5px] text-[#31302e] hover:text-red-600 hover:bg-red-500/5 transition-colors cursor-pointer text-left"
             >
-              <LogOut className="w-4 h-4 stroke-[1.8]" />
-              <span className="text-sm">Sign Out</span>
+              <LogOut className="w-4 h-4" strokeWidth={1.8} />
+              <span className="text-[14px]">Sign Out</span>
             </button>
           </div>
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col overflow-hidden relative bg-[#f6f5f4]">
+        <main className="flex flex-col overflow-hidden relative bg-[#f6f5f4]" style={{ padding: 0 }}>
           {/* Top Header */}
-          <header className="h-14 border-b border-[#e6e6e6] flex items-center justify-between px-6 shrink-0 relative z-10 bg-white/80 backdrop-blur-xl">
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden w-8 h-8 rounded-md flex items-center justify-center border border-[#e6e6e6] text-[#615d59] hover:bg-black/5"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-
-            {/* Breadcrumb Info */}
+          <header className="sticky top-0 z-10 border-b border-[#e6e6e6] flex items-center justify-between px-8 py-[14px] shrink-0"
+            style={{ background: 'rgba(246,245,244,0.85)', backdropFilter: 'saturate(180%) blur(12px)' }}
+          >
+            {/* Left: Toggle + Breadcrumb */}
             <div className="flex items-center gap-1.5 text-[13px] text-[#615d59]">
-              <span className="font-semibold text-black">{firmData?.firm_name || 'Sharma & Co'}</span>
+              {/* Sidebar Toggle Button */}
+              <button
+                onClick={() => setSidebarCollapsed(prev => !prev)}
+                title="Toggle sidebar"
+                className="w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] inline-flex items-center justify-center text-[#615d59] shrink-0 mr-1 cursor-pointer hover:bg-[#f6f5f4] transition-colors"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="9" y1="3" x2="9" y2="21" />
+                </svg>
+              </button>
+
+              {/* Mobile menu toggle */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden w-[30px] h-[30px] rounded-[7px] bg-white border border-[#e6e6e6] inline-flex items-center justify-center text-[#615d59]"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+
+              <span>{firmData?.firm_name || 'Sharma & Co'}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a39e98" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-              <span className="capitalize">{getActiveNav()}</span>
+              <span className="text-black font-medium capitalize">{getActiveNav()}</span>
             </div>
 
-            {/* Quick Actions & Avatar */}
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => alert('Add client feature is coming soon.')}
-                className="py-1.5 px-3.5 bg-[#0075de] hover:bg-[#005bb5] text-white rounded-full font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2">
+              <button className="py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] inline-flex items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#31302e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              </button>
+              <button className="py-[5px] px-3 bg-white border border-[#e6e6e6] rounded-lg text-[14px] font-medium text-[#31302e] inline-flex items-center gap-1.5 hover:bg-[#f6f5f4] transition-colors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#31302e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+                Export
+              </button>
+              <Link
+                href="/dashboard/clients"
+                className="py-[9px] px-4 bg-[#0075de] text-white rounded-full text-[14px] font-medium inline-flex items-center gap-1.5 hover:bg-[#005bb5] transition-colors"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                 Add client
-              </button>
-
-              <button className="w-8 h-8 rounded-full border border-[#e6e6e6] bg-white flex items-center justify-center text-[#615d59] hover:bg-gray-50 transition-colors relative cursor-pointer">
-                <Bell className="w-4 h-4" />
-                <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0075de] rounded-full" />
-              </button>
-
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff64c8] to-[#d6b6f6] text-white flex items-center justify-center font-bold text-[13px] shadow-sm select-none">
+              </Link>
+              <div className="ml-2 w-8 h-8 rounded-full bg-gradient-to-br from-[#ff64c8] to-[#d6b6f6] text-white flex items-center justify-center font-bold text-[13px] cursor-pointer select-none">
                 {getWorkspaceInitials()}
               </div>
             </div>
@@ -315,7 +348,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
-                className="p-6 md:p-10 max-w-[1400px] mx-auto"
+                className="p-6 md:px-12 md:py-10 max-w-[1400px] mx-auto"
               >
                 {children}
               </motion.div>
@@ -326,4 +359,3 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </DashboardContext.Provider>
   );
 }
-

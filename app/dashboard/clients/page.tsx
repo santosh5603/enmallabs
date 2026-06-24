@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useDashboard } from '../dashboard-context';
-import { useClients, useDocuments, formatRelativeTime, formatCurrency } from '@/hooks/use-dashboard-data';
-import type { DocumentFilters } from '@/hooks/use-dashboard-data';
+import { useDocuments, formatRelativeTime, formatCurrency } from '@/hooks/use-dashboard-data';
+import type { DocumentFilters, ClientInfo } from '@/hooks/use-dashboard-data';
 import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { EmptyState, CardGridSkeleton } from '@/components/dashboard/EmptyState';
 import { FilterBar } from '@/components/dashboard/FilterBar';
@@ -13,11 +13,10 @@ import { Users, FileText, IndianRupee, Send, Building2, X, ArrowLeft, Eye, UserP
 import { getSupabase } from '@/lib/supabase';
 
 export default function ClientsPage() {
-  const { firmData, firmLoading } = useDashboard();
-  const { clients, loading, refetch } = useClients(firmData?.id || null);
+  const { firmData, firmLoading, clients, clientsLoading: loading, refetchClients: refetch } = useDashboard();
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<string | null>(null);
-  const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<ClientInfo | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredClients = useMemo(() => {
@@ -32,7 +31,7 @@ export default function ClientsPage() {
   const isLoading = firmLoading || loading;
 
   if (selectedClient) {
-    return <ClientDetailView clientName={selectedClient} firmId={firmData?.id || ''} onBack={() => setSelectedClient(null)} />;
+    return <ClientDetailView clientName={selectedClient.name} clientId={selectedClient.id || null} firmId={firmData?.id || ''} onBack={() => setSelectedClient(null)} />;
   }
 
   return (
@@ -75,7 +74,7 @@ export default function ClientsPage() {
           {filteredClients.map((client, i) => (
             <motion.div key={client.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              onClick={() => setSelectedClient(client.name)}
+              onClick={() => setSelectedClient(client)}
               className="bg-white border border-[#e6e6e6] rounded-[20px] p-6 group hover:border-[#ddd] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 cursor-pointer shadow-sm">
               <div className="flex items-start gap-4 mb-5">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0075de]/10 to-[#0075de]/20 border border-[#0075de]/20 flex items-center justify-center font-bold text-sm text-[#0075de] shrink-0">
@@ -112,9 +111,17 @@ export default function ClientsPage() {
 
 // ─── Client Detail View ──────────────────────────────────────────────────────
 
-function ClientDetailView({ clientName, firmId, onBack }: { clientName: string; firmId: string; onBack: () => void }) {
-  const emptyFilters: DocumentFilters = { search: '', documentType: null, processingStatus: null, dateFrom: null, dateTo: null, vendor: clientName };
-  const { documents, loading } = useDocuments(firmId, emptyFilters);
+function ClientDetailView({ clientName, clientId, firmId, onBack }: { clientName: string; clientId: string | null; firmId: string; onBack: () => void }) {
+  const filters = useMemo(() => ({
+    search: '',
+    documentType: null,
+    processingStatus: null,
+    dateFrom: null,
+    dateTo: null,
+    vendor: clientName,
+    clientId: clientId
+  }), [clientName, clientId]);
+  const { documents, loading } = useDocuments(firmId, filters);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
   const totalAmount = documents.reduce((s, d) => s + (d.total_amount || 0), 0);

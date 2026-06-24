@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter, Cormorant_Garamond } from 'next/font/google';
+import { Inter, Cormorant_Garamond, Geist } from 'next/font/google';
 import './globals.css'; // Global styles
 import { AuthProvider } from '@/lib/auth-context';
+import { cn } from "@/lib/utils";
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-});
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const cormorantGaramond = Cormorant_Garamond({
   subsets: ['latin'],
@@ -21,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${cormorantGaramond.variable} bg-black`}>
+    <html lang="en" className={cn("bg-black", cormorantGaramond.variable, "font-sans", geist.variable)}>
       <body className="font-sans antialiased text-white selection:bg-accent/30" suppressHydrationWarning>
         <AuthProvider>
           {children}

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext } from 'react';
-import type { FirmData } from '@/hooks/use-dashboard-data';
+import type { FirmData, DashboardStats, ClientInfo } from '@/hooks/use-dashboard-data';
 
 export interface DashboardContextValue {
   user: any;
@@ -14,6 +14,11 @@ export interface DashboardContextValue {
   documentCount: number;
   clientCount: number;
   chatCount: number;
+  stats: DashboardStats | null;
+  statsLoading: boolean;
+  clients: ClientInfo[];
+  clientsLoading: boolean;
+  refetchClients: () => void;
 }
 
 export const DashboardContext = createContext<DashboardContextValue>({
@@ -27,6 +32,11 @@ export const DashboardContext = createContext<DashboardContextValue>({
   documentCount: 0,
   clientCount: 0,
   chatCount: 0,
+  stats: null,
+  statsLoading: true,
+  clients: [],
+  clientsLoading: true,
+  refetchClients: () => {},
 });
 
 export const useDashboard = () => useContext(DashboardContext);

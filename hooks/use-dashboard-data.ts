@@ -66,6 +66,7 @@ export interface ChatLogRecord {
 }
 
 export interface ClientInfo {
+  id?: string;
   name: string;
   documentCount: number;
   totalAmount: number;
@@ -81,6 +82,7 @@ export interface DocumentFilters {
   dateFrom: string | null;
   dateTo: string | null;
   vendor: string | null;
+  clientId?: string | null;
 }
 
 export interface FirmData {
@@ -122,12 +124,12 @@ function mapDocumentRecord(raw: any): DocumentRecord {
     ...raw,
     original_file_name: ed.file_name || ed.original_file_name || `Document ${raw.document_type || 'Unknown'}`,
     total_amount: ed.total_amount ?? ed.invoice_value ?? ed.amount ?? null,
-    vendor_name: ed.vendor_name ?? ed.supplier_name ?? ed.seller_name ?? null,
-    buyer_name: ed.buyer_name ?? ed.customer_name ?? null,
-    vendor_gstin: ed.vendor_gstin ?? ed.supplier_gstin ?? null,
-    buyer_gstin: ed.buyer_gstin ?? ed.customer_gstin ?? null,
-    invoice_number: ed.invoice_number ?? ed.invoice_no ?? null,
-    transaction_date: ed.transaction_date ?? ed.invoice_date ?? null,
+    vendor_name: ed.vendor_name ?? ed.vendor?.name ?? ed.supplier_name ?? ed.supplier?.name ?? ed.seller_name ?? null,
+    buyer_name: ed.buyer_name ?? ed.buyer?.name ?? ed.customer_name ?? ed.customer?.name ?? null,
+    vendor_gstin: ed.vendor_gstin ?? ed.vendor?.gstin ?? ed.supplier_gstin ?? ed.supplier?.gstin ?? null,
+    buyer_gstin: ed.buyer_gstin ?? ed.buyer?.gstin ?? ed.customer_gstin ?? ed.customer?.gstin ?? null,
+    invoice_number: ed.invoice_number ?? ed.invoice_no ?? ed.invoice_details?.invoice_number ?? null,
+    transaction_date: ed.transaction_date ?? ed.invoice_date ?? ed.invoice_details?.invoice_date ?? null,
     intent_tag: ed.intent_tag ?? raw.document_type ?? null,
   };
 }
@@ -168,8 +170,8 @@ export function useFirmData(supabaseUserId: string | null) {
     fetchFirm();
 
     // Realtime subscription
-    channelRef.current = supabase
-      .channel(`firm-${supabaseUserId}`)
+    const channel = supabase
+      .channel(`firm-${supabaseUserId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         {
@@ -185,9 +187,13 @@ export function useFirmData(supabaseUserId: string | null) {
         }
       )
       .subscribe();
+    channelRef.current = channel;
 
     return () => {
-      channelRef.current?.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [supabaseUserId]);
 
@@ -264,8 +270,8 @@ export function useDashboardStats(firmId: string | null) {
     const supabase = getSupabase();
 
     // Realtime: re-fetch stats when documents or conversations change
-    channelRef.current = supabase
-      .channel(`stats-${firmId}`)
+    const channel = supabase
+      .channel(`stats-${firmId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'documents', filter: `ca_firm_id=eq.${firmId}` },
@@ -277,9 +283,13 @@ export function useDashboardStats(firmId: string | null) {
         () => fetchStats()
       )
       .subscribe();
+    channelRef.current = channel;
 
     return () => {
-      channelRef.current?.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [firmId, fetchStats]);
 
@@ -294,6 +304,8 @@ export function useDocuments(firmId: string | null, filters: DocumentFilters) {
   const [totalCount, setTotalCount] = useState(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
 
+  const { search, documentType, processingStatus, dateFrom, dateTo, vendor, clientId } = filters;
+
   const fetchDocuments = useCallback(async () => {
     if (!firmId) return;
     const supabase = getSupabase();
@@ -301,30 +313,54 @@ export function useDocuments(firmId: string | null, filters: DocumentFilters) {
 
     let query = supabase
       .from('documents')
-      .select('*', { count: 'exact' })
+      .select('*')
       .eq('ca_firm_id', firmId)
       .order('created_at', { ascending: false });
 
-    if (filters.documentType) {
-      query = query.eq('document_type', filters.documentType);
+    if (documentType) {
+      query = query.eq('document_type', documentType);
     }
-    if (filters.processingStatus) {
-      query = query.eq('processing_status', filters.processingStatus);
+    if (processingStatus) {
+      query = query.eq('processing_status', processingStatus);
     }
-    if (filters.dateFrom) {
-      query = query.gte('created_at', filters.dateFrom);
+    if (dateFrom) {
+      query = query.gte('created_at', dateFrom);
     }
-    if (filters.dateTo) {
-      query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+    if (dateTo) {
+      query = query.lte('created_at', dateTo + 'T23:59:59');
     }
 
-    const { data, error, count } = await query;
+    const { data, error } = await query;
     if (!error) {
-      setDocuments((data || []).map(mapDocumentRecord));
-      setTotalCount(count || 0);
+      let mapped = (data || []).map(mapDocumentRecord);
+
+      // Filter by clientId or vendor if specified
+      if (clientId) {
+        mapped = mapped.filter(d => d.client_id === clientId);
+      } else if (vendor) {
+        const vLower = vendor.toLowerCase();
+        mapped = mapped.filter(d => 
+          (d.vendor_name && d.vendor_name.toLowerCase().includes(vLower)) ||
+          (d.buyer_name && d.buyer_name.toLowerCase().includes(vLower))
+        );
+      }
+
+      // Filter by search if specified
+      if (search) {
+        const sLower = search.toLowerCase();
+        mapped = mapped.filter(d =>
+          (d.vendor_name && d.vendor_name.toLowerCase().includes(sLower)) ||
+          (d.buyer_name && d.buyer_name.toLowerCase().includes(sLower)) ||
+          (d.original_file_name && d.original_file_name.toLowerCase().includes(sLower)) ||
+          (d.invoice_number && d.invoice_number.toLowerCase().includes(sLower))
+        );
+      }
+
+      setDocuments(mapped);
+      setTotalCount(mapped.length);
     }
     setLoading(false);
-  }, [firmId, filters]);
+  }, [firmId, search, documentType, processingStatus, dateFrom, dateTo, vendor, clientId]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -336,17 +372,21 @@ export function useDocuments(firmId: string | null, filters: DocumentFilters) {
     if (!firmId) return;
     const supabase = getSupabase();
 
-    channelRef.current = supabase
-      .channel(`docs-${firmId}`)
+    const channel = supabase
+      .channel(`docs-${firmId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'documents', filter: `ca_firm_id=eq.${firmId}` },
         () => fetchDocuments()
       )
       .subscribe();
+    channelRef.current = channel;
 
     return () => {
-      channelRef.current?.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [firmId, fetchDocuments]);
 
@@ -367,11 +407,11 @@ export function useClients(firmId: string | null) {
     const [docsResult, clientsResult] = await Promise.all([
       supabase
         .from('documents')
-        .select('document_type, processing_status, extraction_data, created_at')
+        .select('id, document_type, processing_status, extraction_data, created_at, client_id')
         .eq('ca_firm_id', firmId),
       supabase
         .from('clients')
-        .select('trade_name, legal_name, created_at')
+        .select('id, trade_name, legal_name, created_at')
         .eq('ca_firm_id', firmId)
     ]);
 
@@ -379,13 +419,16 @@ export function useClients(firmId: string | null) {
     const manualClients = clientsResult.data;
 
     const clientMap = new Map<string, ClientInfo>();
+    const manualClientsMap = new Map<string, string>(); // client_id -> name
 
     // Add all manually created clients
     if (manualClients) {
       manualClients.forEach((c: any) => {
         const name = c.trade_name || c.legal_name || 'Unknown';
         if (name === 'Unknown') return;
+        manualClientsMap.set(c.id, name);
         clientMap.set(name, {
+          id: c.id,
           name,
           documentCount: 0,
           totalAmount: 0,
@@ -400,7 +443,15 @@ export function useClients(firmId: string | null) {
     if (docs) {
       docs.forEach((doc: any) => {
         const ed = doc.extraction_data || {};
-        const name = ed.vendor_name || ed.supplier_name || ed.buyer_name || ed.customer_name || 'Unknown';
+        
+        // Match client by client_id first, fallback to extraction_data names
+        let name = 'Unknown';
+        if (doc.client_id && manualClientsMap.has(doc.client_id)) {
+          name = manualClientsMap.get(doc.client_id)!;
+        } else {
+          name = ed.vendor_name || ed.vendor?.name || ed.supplier_name || ed.supplier?.name || ed.buyer_name || ed.buyer?.name || ed.customer_name || ed.customer?.name || 'Unknown';
+        }
+        
         if (name === 'Unknown') return;
 
         const amt = ed.total_amount ?? ed.invoice_value ?? ed.amount ?? 0;
@@ -445,8 +496,8 @@ export function useClients(firmId: string | null) {
     if (!firmId) return;
     const supabase = getSupabase();
 
-    channelRef.current = supabase
-      .channel(`clients-${firmId}`)
+    const channel = supabase
+      .channel(`clients-${firmId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'documents', filter: `ca_firm_id=eq.${firmId}` },
@@ -458,9 +509,13 @@ export function useClients(firmId: string | null) {
         () => fetchClients()
       )
       .subscribe();
+    channelRef.current = channel;
 
     return () => {
-      channelRef.current?.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [firmId, fetchClients]);
 
@@ -544,8 +599,8 @@ export function useRecentActivity(firmId: string | null, limit: number = 10) {
     if (!firmId) return;
     const supabase = getSupabase();
 
-    channelRef.current = supabase
-      .channel(`activity-${firmId}`)
+    const channel = supabase
+      .channel(`activity-${firmId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'documents', filter: `ca_firm_id=eq.${firmId}` },
@@ -557,9 +612,13 @@ export function useRecentActivity(firmId: string | null, limit: number = 10) {
         () => fetchActivity()
       )
       .subscribe();
+    channelRef.current = channel;
 
     return () => {
-      channelRef.current?.unsubscribe();
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
     };
   }, [firmId, fetchActivity]);
 
@@ -624,7 +683,7 @@ export function useChatLogs(firmId: string | null, limit: number = 50) {
     fetchLogs();
 
     const channel = supabase
-      .channel(`chats-${firmId}`)
+      .channel(`chats-${firmId}-${Math.random().toString(36).slice(2, 9)}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'conversations', filter: `ca_firm_id=eq.${firmId}` },
@@ -633,7 +692,7 @@ export function useChatLogs(firmId: string | null, limit: number = 50) {
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [firmId, limit]);
 
