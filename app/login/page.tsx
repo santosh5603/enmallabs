@@ -7,6 +7,7 @@ import { Mail, Lock as LockIcon, AlertCircle, Loader2, KeyRound, ArrowRight, Che
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   return (
@@ -106,7 +107,7 @@ function LoginContent() {
       {/* Top Bar Header */}
       <header className="py-5 px-8 md:px-12 flex justify-between items-center bg-[#f6f5f4]">
         <Link href="/" className="flex items-center gap-2 group">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#0075de] text-white font-extrabold text-[15px] tracking-tighter">E</span>
+          <Image src="/enma-logo.svg" alt="Enma" width={28} height={28} className="rounded-lg" />
           <span className="font-bold text-[17px] tracking-tight text-black">Enma</span>
         </Link>
         <div className="text-sm text-[#615d59]">
@@ -140,6 +141,12 @@ function LoginContent() {
           transition={{ duration: 0.4 }}
           className="w-full max-w-[420px] bg-white border border-[#e6e6e6] rounded-2xl p-8 md:p-10 relative z-10 shadow-[0_4px_18px_rgba(0,0,0,0.04)]"
         >
+          {/* Logo */}
+          <div className="flex items-center gap-2.5 mb-7">
+            <Image src="/enma-logo.svg" alt="Enma" width={36} height={36} className="rounded-xl" />
+            <span className="font-bold text-[20px] tracking-tight text-black">Enma</span>
+          </div>
+
           <div className="mb-8">
             <h1 className="text-3px font-bold text-[32px] tracking-[-0.625px] leading-tight text-black mb-2">Welcome back.</h1>
             <p className="text-[15px] text-[#615d59]">Sign in to your CA firm dashboard.</p>

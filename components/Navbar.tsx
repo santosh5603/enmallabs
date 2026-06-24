@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { GlassButton } from './GlassButton';
 
 export default function Navbar() {
@@ -22,7 +23,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-[#e6e6e6] px-6">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-3.5">
         <Link href="/" className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-accent text-white font-extrabold text-[15px] tracking-tighter">E</span>
+          <Image src="/enma-logo.svg" alt="Enma" width={28} height={28} className="rounded-lg"/>
           <span className="font-bold text-[17px] text-black tracking-tight">Enma</span>
         </Link>
 
