@@ -6,7 +6,7 @@ import { getSupabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import {
   Building2, User, Mail, Phone, Shield, Send, CheckCircle2,
-  Clock, AlertCircle, Save, Loader2, ExternalLink,
+  Clock, AlertCircle, Save, Loader2, ExternalLink, Eye, EyeOff,
 } from 'lucide-react';
 import { GlassButton } from '@/components/GlassButton';
 
@@ -23,6 +23,8 @@ export default function SettingsPage() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState('');
@@ -53,6 +55,8 @@ export default function SettingsPage() {
       setPasswordSuccess(true);
       setNewPassword('');
       setConfirmNewPassword('');
+      setShowPassword(false);
+      setShowConfirmPassword(false);
     } catch (err: any) {
       setPasswordError(err.message || 'Failed to update password.');
     } finally {
@@ -361,25 +365,45 @@ export default function SettingsPage() {
           <form onSubmit={handleChangePassword} className="space-y-5">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">New Password</label>
-              <input
-                type="password"
-                placeholder="Enter new password (min 8 chars)"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm px-4 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter new password (min 8 chars)"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">Confirm New Password</label>
-              <input
-                type="password"
-                placeholder="Confirm new password"
-                required
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm px-4 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  required
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <GlassButton
               type="submit"

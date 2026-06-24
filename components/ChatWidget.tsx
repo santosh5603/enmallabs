@@ -10,7 +10,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{role: string, text: string}[]>([
+  const [messages, setMessages] = useState<{ role: string, text: string }[]>([
     { role: 'model', text: 'Hi! I am Enma. Have any questions about our features, security, or pricing?' }
   ]);
   const [input, setInput] = useState('');

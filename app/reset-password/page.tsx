@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Lock as LockIcon, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { Lock as LockIcon, AlertCircle, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { GlassButton } from '@/components/GlassButton';
@@ -24,6 +24,8 @@ function ResetPasswordContent() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -98,13 +100,21 @@ function ResetPasswordContent() {
             <div className="relative">
               <LockIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="New Password (min 8 chars)"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-4 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-12 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
@@ -112,13 +122,21 @@ function ResetPasswordContent() {
             <div className="relative">
               <LockIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm New Password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-4 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white pl-11 pr-12 py-4 focus:outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all placeholder:text-white/20"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
