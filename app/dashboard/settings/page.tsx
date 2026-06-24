@@ -8,7 +8,6 @@ import {
   Building2, User, Mail, Phone, Shield, Send, CheckCircle2,
   Clock, AlertCircle, Save, Loader2, ExternalLink, Eye, EyeOff,
 } from 'lucide-react';
-import { GlassButton } from '@/components/GlassButton';
 
 export default function SettingsPage() {
   const { firmData, firmLoading, user } = useDashboard();
@@ -99,14 +98,14 @@ export default function SettingsPage() {
   if (firmLoading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="h-8 w-32 bg-white/10 rounded animate-pulse mb-8" />
+        <div className="h-8 w-32 bg-black/[0.05] rounded animate-pulse mb-8" />
         <div className="space-y-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="glass-card rounded-[24px] p-8">
-              <div className="h-5 w-40 bg-white/10 rounded animate-pulse mb-6" />
+            <div key={i} className="bg-white border border-[#e6e6e6] rounded-[20px] p-8 shadow-sm">
+              <div className="h-5 w-40 bg-black/[0.05] rounded animate-pulse mb-6" />
               <div className="space-y-4">
-                <div className="h-12 bg-white/5 rounded-xl animate-pulse" />
-                <div className="h-12 bg-white/5 rounded-xl animate-pulse" />
+                <div className="h-12 bg-black/[0.03] rounded-xl animate-pulse" />
+                <div className="h-12 bg-black/[0.03] rounded-xl animate-pulse" />
               </div>
             </div>
           ))}
@@ -118,8 +117,8 @@ export default function SettingsPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-medium mb-2">Settings</h1>
-        <p className="text-white/40 text-sm">Manage your firm profile and integrations.</p>
+        <h1 className="text-3xl font-bold text-black mb-2">Settings</h1>
+        <p className="text-[#615d59] text-sm">Manage your firm profile and integrations.</p>
       </div>
 
       {/* Save Success */}
@@ -128,10 +127,10 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3"
+          className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-3"
         >
-          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-          <span className="text-sm text-emerald-400">Settings saved successfully.</span>
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 animate-bounce" />
+          <span className="text-sm text-emerald-700 font-semibold">Settings saved successfully.</span>
         </motion.div>
       )}
 
@@ -140,19 +139,19 @@ export default function SettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card rounded-[24px] p-8"
+          className="bg-white border border-[#e6e6e6] rounded-[20px] p-8 shadow-sm"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-accent" />
+              <div className="w-10 h-10 rounded-xl bg-[#0075de]/5 border border-[#0075de]/15 flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-[#0075de]" />
               </div>
-              <h2 className="font-serif text-xl font-medium">Firm Profile</h2>
+              <h2 className="text-xl font-bold text-black">Firm Profile</h2>
             </div>
             {!editing && (
               <button
                 onClick={startEditing}
-                className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                className="px-4 py-2 rounded-xl bg-black/[0.03] border border-[#e6e6e6] text-xs font-bold text-[#615d59] hover:text-black hover:bg-black/[0.08] transition-all"
               >
                 Edit
               </button>
@@ -191,18 +190,18 @@ export default function SettingsPage() {
           </div>
 
           {editing && (
-            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-white/5">
+            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[#e6e6e6]/60">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent/20 border border-accent/30 text-white text-sm font-bold hover:bg-accent/30 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0075de] text-white text-sm font-bold hover:bg-[#005fb8] transition-all disabled:opacity-50 shadow-sm"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-bold text-white/50 hover:text-white transition-all"
+                className="px-5 py-2.5 rounded-xl bg-black/[0.03] border border-[#e6e6e6] text-sm font-bold text-[#615d59] hover:text-black hover:bg-black/[0.08] transition-all"
               >
                 Cancel
               </button>
@@ -215,23 +214,23 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="glass-card rounded-[24px] p-8"
+          className="bg-white border border-[#e6e6e6] rounded-[20px] p-8 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[#229ED9]/5 border border-[#229ED9]/15 flex items-center justify-center">
               <Send className="w-5 h-5 text-[#229ED9]" />
             </div>
-            <h2 className="font-serif text-xl font-medium">Telegram Integration</h2>
+            <h2 className="text-xl font-bold text-black">Telegram Integration</h2>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3">
               <div className="flex items-center gap-3">
-                <span className="text-sm text-white/60">Connection Status</span>
+                <span className="text-sm text-[#615d59]">Connection Status</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${firmData?.telegram_chat_id ? 'bg-emerald-500 animate-pulse' : 'bg-white/20'}`} />
-                <span className={`text-sm font-bold ${firmData?.telegram_chat_id ? 'text-emerald-400' : 'text-white/40'}`}>
+                <div className={`w-2 h-2 rounded-full ${firmData?.telegram_chat_id ? 'bg-emerald-500 animate-pulse' : 'bg-black/[0.1]'}`} />
+                <span className={`text-sm font-bold ${firmData?.telegram_chat_id ? 'text-emerald-600' : 'text-[#615d59]/70'}`}>
                   {firmData?.telegram_chat_id ? 'Connected' : 'Not Connected'}
                 </span>
               </div>
@@ -239,14 +238,14 @@ export default function SettingsPage() {
 
             {firmData?.telegram_chat_id && (
               <>
-                <div className="flex items-center justify-between py-3 border-t border-white/5">
-                  <span className="text-sm text-white/60">Chat ID</span>
-                  <span className="text-sm font-mono text-white/40">{firmData.telegram_chat_id}</span>
+                <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+                  <span className="text-sm text-[#615d59]">Chat ID</span>
+                  <span className="text-sm font-mono text-black font-bold">{firmData.telegram_chat_id}</span>
                 </div>
                 {firmData.telegram_linked_at && (
-                  <div className="flex items-center justify-between py-3 border-t border-white/5">
-                    <span className="text-sm text-white/60">Connected Since</span>
-                    <span className="text-sm text-white/40">
+                  <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+                    <span className="text-sm text-[#615d59]">Connected Since</span>
+                    <span className="text-sm text-black font-bold">
                       {new Date(firmData.telegram_linked_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -258,7 +257,7 @@ export default function SettingsPage() {
               href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#229ED9]/10 border border-[#229ED9]/20 text-[#229ED9] text-sm font-bold hover:bg-[#229ED9]/20 transition-all mt-4"
+              className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#229ED9] text-white text-sm font-bold hover:bg-[#1e8cc1] transition-all mt-4 shadow-sm border border-[#229ED9]/10"
             >
               <Send className="w-4 h-4" />
               {firmData?.telegram_chat_id ? 'Open Telegram Bot' : 'Connect Telegram'}
@@ -272,61 +271,61 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="glass-card rounded-[24px] p-8"
+          className="bg-white border border-[#e6e6e6] rounded-[20px] p-8 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-emerald-400" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-emerald-600" />
             </div>
-            <h2 className="font-serif text-xl font-medium">Compliance & DPA</h2>
+            <h2 className="text-xl font-bold text-black">Compliance & DPA</h2>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3">
-              <span className="text-sm text-white/60">DPA Status</span>
+              <span className="text-sm text-[#615d59]">DPA Status</span>
               <div className="flex items-center gap-2">
                 {firmData?.dpa_consented ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm font-bold text-emerald-400">Signed</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span className="text-sm font-bold text-emerald-600">Signed</span>
                   </>
                 ) : (
                   <>
-                    <AlertCircle className="w-4 h-4 text-amber-400" />
-                    <span className="text-sm font-bold text-amber-400">Pending</span>
+                    <AlertCircle className="w-4 h-4 text-amber-600" />
+                    <span className="text-sm font-bold text-amber-600">Pending</span>
                   </>
                 )}
               </div>
             </div>
 
             {firmData?.dpa_consented_at && (
-              <div className="flex items-center justify-between py-3 border-t border-white/5">
-                <span className="text-sm text-white/60">Signed At</span>
-                <span className="text-sm text-white/40">
+              <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+                <span className="text-sm text-[#615d59]">Signed At</span>
+                <span className="text-sm text-black font-bold">
                   {new Date(firmData.dpa_consented_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
             )}
 
-            <div className="flex items-center justify-between py-3 border-t border-white/5">
-              <span className="text-sm text-white/60">Subscription Plan</span>
-              <span className="text-sm font-bold text-accent capitalize">{firmData?.subscription_plan || 'Trial'}</span>
+            <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+              <span className="text-sm text-[#615d59]">Subscription Plan</span>
+              <span className="text-sm font-bold text-[#0075de] capitalize">{firmData?.subscription_plan || 'Trial'}</span>
             </div>
 
-            <div className="flex items-center justify-between py-3 border-t border-white/5">
-              <span className="text-sm text-white/60">Account Created</span>
-              <span className="text-sm text-white/40">
+            <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+              <span className="text-sm text-[#615d59]">Account Created</span>
+              <span className="text-sm text-black font-bold">
                 {firmData?.created_at
                   ? new Date(firmData.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
                   : '—'}
               </span>
             </div>
 
-            <div className="flex items-center justify-between py-3 border-t border-white/5">
-              <span className="text-sm text-white/60">Account Status</span>
+            <div className="flex items-center justify-between py-3 border-t border-[#e6e6e6]/60">
+              <span className="text-sm text-[#615d59]">Account Status</span>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${firmData?.is_active ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                <span className={`text-sm font-bold ${firmData?.is_active ? 'text-emerald-400' : 'text-red-400'}`}>
+                <span className={`text-sm font-bold ${firmData?.is_active ? 'text-emerald-600' : 'text-red-600'}`}>
                   {firmData?.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -339,32 +338,32 @@ export default function SettingsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="glass-card rounded-[24px] p-8"
+          className="bg-white border border-[#e6e6e6] rounded-[20px] p-8 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-accent" />
+            <div className="w-10 h-10 rounded-xl bg-[#0075de]/5 border border-[#0075de]/15 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-[#0075de]" />
             </div>
-            <h2 className="font-serif text-xl font-medium">Security & Password</h2>
+            <h2 className="text-xl font-bold text-black">Security & Password</h2>
           </div>
 
           {passwordSuccess && (
-            <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>Password updated successfully.</span>
+            <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm flex items-center gap-3">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span className="font-semibold">Password updated successfully.</span>
             </div>
           )}
 
           {passwordError && (
-            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{passwordError}</span>
+            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-3">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span className="font-semibold">{passwordError}</span>
             </div>
           )}
 
           <form onSubmit={handleChangePassword} className="space-y-5">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">New Password</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70 block mb-2">New Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -372,12 +371,12 @@ export default function SettingsPage() {
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                  className="w-full bg-white border border-[#e6e6e6] rounded-xl text-black text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-[#0075de] focus:ring-2 focus:ring-[#0075de]/10 transition-all placeholder:text-[#615d59]/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#615d59]/40 hover:text-black transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -385,7 +384,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-2">Confirm New Password</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70 block mb-2">Confirm New Password</label>
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
@@ -393,23 +392,22 @@ export default function SettingsPage() {
                   required
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all placeholder:text-white/20"
+                  className="w-full bg-white border border-[#e6e6e6] rounded-xl text-black text-sm pl-4 pr-12 py-3.5 focus:outline-none focus:border-[#0075de] focus:ring-2 focus:ring-[#0075de]/10 transition-all placeholder:text-[#615d59]/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#615d59]/40 hover:text-black transition-colors"
                   aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-            <GlassButton
+            <button
               type="submit"
-              variant="white"
-              className="px-6 py-3"
               disabled={passwordLoading || !newPassword || !confirmNewPassword}
+              className="px-6 py-3 rounded-full bg-[#0075de] hover:bg-[#005fb8] text-white text-sm font-bold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {passwordLoading ? (
                 <span className="flex items-center gap-2 justify-center">
@@ -419,7 +417,7 @@ export default function SettingsPage() {
               ) : (
                 'Update Password'
               )}
-            </GlassButton>
+            </button>
           </form>
         </motion.div>
       </div>
@@ -432,20 +430,20 @@ function SettingsField({ icon: Icon, label, value, editing, onChange, disabled }
 }) {
   return (
     <div className="flex items-center gap-4">
-      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-white/20" />
+      <div className="w-8 h-8 rounded-lg bg-black/[0.03] flex items-center justify-center shrink-0 border border-[#e6e6e6]">
+        <Icon className="w-4 h-4 text-[#615d59]/50" />
       </div>
       <div className="flex-1">
-        <label className="text-[10px] font-bold uppercase tracking-wider text-white/30 block mb-1">{label}</label>
+        <label className="text-[10px] font-bold uppercase tracking-wider text-[#615d59]/70 block mb-1">{label}</label>
         {editing && !disabled ? (
           <input
             type="text"
             value={value}
             onChange={(e) => onChange?.(e.target.value)}
-            className="w-full bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm px-4 py-3 focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/10 transition-all"
+            className="w-full bg-white border border-[#e6e6e6] rounded-xl text-black text-sm px-4 py-3 focus:outline-none focus:border-[#0075de] focus:ring-2 focus:ring-[#0075de]/10 transition-all"
           />
         ) : (
-          <p className={`text-sm ${disabled ? 'text-white/30' : 'text-white/80'}`}>{value}</p>
+          <p className={`text-sm ${disabled ? 'text-[#615d59]/50' : 'text-black font-semibold'}`}>{value}</p>
         )}
       </div>
     </div>

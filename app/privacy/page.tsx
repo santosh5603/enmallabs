@@ -8,73 +8,72 @@ import Footer from '@/components/Footer';
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-[#f6f5f4] text-black font-sans flex flex-col selection:bg-[#0075de]/20">
       <Navbar />
 
-      <main className="flex-1 pt-40 pb-24 relative overflow-hidden">
+      <main className="flex-1 pt-32 pb-24 relative overflow-hidden bg-white md:bg-[#f6f5f4]">
         {/* Decorative background gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,78,0,0.03),transparent)] pointer-events-none" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
-
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,117,222,0.03),transparent)] pointer-events-none" />
+        
         <div className="max-w-4xl mx-auto px-6 relative z-10">
           {/* Back Button */}
           <Link
             href="/onboarding"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors mb-10 group"
+            className="inline-flex items-center gap-2 text-[#615d59] hover:text-black transition-colors mb-10 group font-medium text-sm cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Onboarding
           </Link>
 
           {/* Header */}
-          <div className="mb-16">
-            <h1 className="font-serif text-4xl md:text-5xl font-medium mb-4 leading-tight">
+          <div className="mb-12">
+            <h1 className="text-[40px] md:text-[48px] font-bold mb-3 leading-tight tracking-tight">
               Privacy Policy
             </h1>
-            <p className="text-white/40 text-sm">Last updated: June 7, 2026</p>
+            <p className="text-[#615d59] text-sm font-medium">Last updated: June 7, 2026</p>
           </div>
 
           {/* Core Info Icons Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
-            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-3xl">
-              <Lock className="w-8 h-8 text-accent mb-4" />
-              <h3 className="font-serif text-lg font-medium mb-2">Secure Encryption</h3>
-              <p className="text-sm text-white/40 leading-relaxed">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+            <div className="p-6 rounded-2xl bg-white border border-[#e6e6e6] shadow-sm">
+              <Lock className="w-8 h-8 text-[#0075de] mb-4" />
+              <h3 className="text-lg font-bold mb-2 text-black">Secure Encryption</h3>
+              <p className="text-sm text-[#615d59] leading-relaxed">
                 All data, documents, and client records are encrypted in transit and at rest.
               </p>
             </div>
-            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-3xl">
-              <Shield className="w-8 h-8 text-accent mb-4" />
-              <h3 className="font-serif text-lg font-medium mb-2">Strict Isolation</h3>
-              <p className="text-sm text-white/40 leading-relaxed">
-                Logical database isolation guarantees your firm's data can never leak to another.
+            <div className="p-6 rounded-2xl bg-white border border-[#e6e6e6] shadow-sm">
+              <Shield className="w-8 h-8 text-[#0075de] mb-4" />
+              <h3 className="text-lg font-bold mb-2 text-black">Strict Isolation</h3>
+              <p className="text-sm text-[#615d59] leading-relaxed">
+                Logical database isolation guarantees your firm&apos;s data can never leak to another.
               </p>
             </div>
-            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-3xl">
-              <Eye className="w-8 h-8 text-accent mb-4" />
-              <h3 className="font-serif text-lg font-medium mb-2">Data Transparency</h3>
-              <p className="text-sm text-white/40 leading-relaxed">
+            <div className="p-6 rounded-2xl bg-white border border-[#e6e6e6] shadow-sm">
+              <Eye className="w-8 h-8 text-[#0075de] mb-4" />
+              <h3 className="text-lg font-bold mb-2 text-black">Data Transparency</h3>
+              <p className="text-sm text-[#615d59] leading-relaxed">
                 We only process data required for OCR extraction and authorized CA operations.
               </p>
             </div>
           </div>
 
           {/* Content */}
-          <div className="prose prose-invert max-w-none space-y-10 font-sans text-white/70 leading-[1.7] text-[16px]">
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+          <div className="max-w-none space-y-10 font-sans text-[#31302e] leading-[1.7] text-[16px]">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 1. Scope & Applicability
               </h2>
               <p>
                 This Privacy Policy applies to the processing of personal and business data by Enma Labs
-                ("we," "us," or "our") in connection with the provision of the Enma CA automation platform.
+                (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) in connection with the provision of the Enma CA automation platform.
                 As a cloud service provider, we act primarily as a <strong>Processor</strong> of data uploaded by
-                Chartered Accountants ("Firms") and their clients.
+                Chartered Accountants (&quot;Firms&quot;) and their clients.
               </p>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 2. Information We Collect
               </h2>
               <p>
@@ -97,8 +96,8 @@ export default function PrivacyPolicyPage() {
               </ul>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 3. How We Process and Use Information
               </h2>
               <p>
@@ -125,20 +124,20 @@ export default function PrivacyPolicyPage() {
               </ul>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 4. Data Sharing & Sub-processors
               </h2>
               <p>
-                We do not sell, rent, or trade your firm's or clients' data to third parties. We only share information
+                We do not sell, rent, or trade your firm&apos;s or clients&apos; data to third parties. We only share information
                 with trusted sub-processors necessary to run the infrastructure (e.g., hosting services, secure database
                 platforms, and isolated API runtimes) under strict contractual terms. A list of current sub-processors is
                 maintained in our Data Processing Addendum (DPA).
               </p>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 5. Security and Logical Isolation
               </h2>
               <p>
@@ -150,7 +149,7 @@ export default function PrivacyPolicyPage() {
                   using AES-256.
                 </li>
                 <li>
-                  <strong>Logical Data Isolation:</strong> Every firm's dataset is isolated inside our PostgreSQL schema
+                  <strong>Logical Data Isolation:</strong> Every firm&apos;s dataset is isolated inside our PostgreSQL schema
                   and governed by rigorous Row-Level Security (RLS) policies at the database engine level.
                 </li>
                 <li>
@@ -160,8 +159,8 @@ export default function PrivacyPolicyPage() {
               </ul>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 6. Data Retention & Deletion
               </h2>
               <p>
@@ -171,19 +170,19 @@ export default function PrivacyPolicyPage() {
               </p>
             </section>
 
-            <section className="space-y-4">
-              <h2 className="font-serif text-2xl text-white font-medium mb-4 border-b border-white/5 pb-2">
+            <section className="space-y-3">
+              <h2 className="text-2xl text-black font-bold mb-3 border-b border-[#e6e6e6] pb-2">
                 7. Contact Us
               </h2>
               <p>
                 If you have questions about our data processing, security controls, or this Privacy Policy, please
                 reach out to our privacy officer at:
               </p>
-              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 mt-4 inline-block">
-                <p className="text-white font-medium">Enma Labs Privacy Team</p>
+              <div className="p-6 rounded-2xl bg-white border border-[#e6e6e6] mt-4 inline-block shadow-sm">
+                <p className="text-black font-bold">Enma Labs Privacy Team</p>
                 <a
                   href="mailto:privacy@enmalabs.com"
-                  className="text-accent hover:text-accent-hover font-bold transition-colors mt-1 inline-block"
+                  className="text-[#0075de] hover:text-[#005bb5] font-bold transition-colors mt-1 inline-block"
                 >
                   privacy@enmalabs.com
                 </a>

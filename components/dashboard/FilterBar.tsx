@@ -36,10 +36,10 @@ function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps
       <button
         onClick={() => setOpen(!open)}
         className={`
-          flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200
+          flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all duration-200 border
           ${value
-            ? 'bg-accent/10 border border-accent/20 text-accent'
-            : 'bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10'
+            ? 'bg-[#0075de]/10 border-[#0075de]/20 text-[#0075de]'
+            : 'bg-white border-[#e6e6e6] text-[#615d59] hover:text-black hover:bg-black/[0.02]'
           }
         `}
       >
@@ -54,11 +54,11 @@ function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full mt-2 left-0 z-50 min-w-[180px] bg-black/95 backdrop-blur-xl border border-white/10 rounded-2xl p-1.5 shadow-2xl"
+            className="absolute top-full mt-2 left-0 z-50 min-w-[180px] bg-white border border-[#e6e6e6] rounded-2xl p-1.5 shadow-xl"
           >
             <button
               onClick={() => { onChange(null); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all ${!value ? 'text-accent bg-accent/5' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+              className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all ${!value ? 'text-[#0075de] bg-[#0075de]/5' : 'text-[#615d59] hover:text-black hover:bg-black/[0.02]'}`}
             >
               All
             </button>
@@ -66,12 +66,12 @@ function FilterDropdown({ label, options, value, onChange }: FilterDropdownProps
               <button
                 key={option.value}
                 onClick={() => { onChange(option.value); setOpen(false); }}
-                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${value === option.value ? 'text-accent bg-accent/5' : 'text-white/50 hover:text-white hover:bg-white/5'
+                className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${value === option.value ? 'text-[#0075de] bg-[#0075de]/5' : 'text-[#615d59] hover:text-black hover:bg-black/[0.02]'
                   }`}
               >
                 <span>{option.label}</span>
                 {option.count !== undefined && (
-                  <span className="text-[10px] text-white/20 font-mono">{option.count}</span>
+                  <span className="text-[10px] text-[#615d59]/50 font-mono">{option.count}</span>
                 )}
               </button>
             ))}
@@ -103,17 +103,17 @@ export function FilterBar({ search, onSearchChange, searchPlaceholder, filters, 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
       {/* Search */}
-      <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2 w-full sm:w-72 transition-all focus-within:border-accent/30 focus-within:bg-white/[0.07]">
-        <Search className="w-4 h-4 text-white/30 shrink-0" />
+      <div className="flex items-center gap-2 bg-white border border-[#e6e6e6] rounded-full px-4 py-2 w-full sm:w-72 transition-all focus-within:border-[#0075de]/50 focus-within:ring-2 focus-within:ring-[#0075de]/5">
+        <Search className="w-4 h-4 text-[#615d59]/40 shrink-0" />
         <input
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder || 'Search...'}
-          className="bg-transparent border-none outline-none text-sm w-full placeholder:text-white/20"
+          className="bg-transparent border-none outline-none text-sm w-full text-black placeholder:text-[#615d59]/40"
         />
         {search && (
-          <button onClick={() => onSearchChange('')} className="text-white/30 hover:text-white">
+          <button onClick={() => onSearchChange('')} className="text-[#615d59]/40 hover:text-black">
             <X className="w-3.5 h-3.5" />
           </button>
         )}
@@ -121,10 +121,10 @@ export function FilterBar({ search, onSearchChange, searchPlaceholder, filters, 
 
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex items-center gap-1 text-white/20 mr-1">
+        <div className="flex items-center gap-1 text-[#615d59]/40 mr-1">
           <SlidersHorizontal className="w-3.5 h-3.5" />
           {activeFiltersCount > 0 && (
-            <span className="text-[10px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-[#0075de] bg-[#0075de]/10 px-1.5 py-0.5 rounded-full">
               {activeFiltersCount}
             </span>
           )}
@@ -143,7 +143,7 @@ export function FilterBar({ search, onSearchChange, searchPlaceholder, filters, 
       {/* Right side */}
       <div className="sm:ml-auto flex items-center gap-3">
         {resultCount !== undefined && (
-          <span className="text-xs text-white/30">
+          <span className="text-xs text-[#615d59]/60">
             {resultCount} result{resultCount !== 1 ? 's' : ''}
           </span>
         )}

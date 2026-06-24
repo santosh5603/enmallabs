@@ -142,6 +142,7 @@ export function useFirmData(supabaseUserId: string | null) {
 
   useEffect(() => {
     if (!supabaseUserId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
@@ -256,6 +257,7 @@ export function useDashboardStats(firmId: string | null) {
   }, [firmId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchStats();
 
     if (!firmId) return;
@@ -325,6 +327,7 @@ export function useDocuments(firmId: string | null, filters: DocumentFilters) {
   }, [firmId, filters]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDocuments();
   }, [fetchDocuments]);
 
@@ -434,6 +437,7 @@ export function useClients(firmId: string | null) {
   }, [firmId]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchClients();
   }, [fetchClients]);
 
@@ -532,6 +536,7 @@ export function useRecentActivity(firmId: string | null, limit: number = 10) {
   }, [firmId, limit]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchActivity();
   }, [fetchActivity]);
 

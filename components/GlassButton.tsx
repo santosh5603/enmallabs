@@ -26,10 +26,10 @@ export function GlassButton({
   const baseStyles = "relative px-6 py-3 rounded-full font-bold text-[13px] transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden group active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 hover:border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.05)]",
-    secondary: "bg-black/20 backdrop-blur-xl border border-white/10 text-white/70 hover:text-white hover:bg-black/40 hover:border-white/20",
-    accent: "bg-accent/20 backdrop-blur-xl border border-accent/30 text-white hover:bg-accent/30 hover:border-accent/50 shadow-[0_0_20px_rgba(255,78,0,0.15)]",
-    white: "bg-white/90 backdrop-blur-xl border border-white text-black hover:bg-white transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]",
+    primary: "bg-accent text-white hover:bg-accent-hover shadow-[0_4px_12px_rgba(0,117,222,0.15)]",
+    secondary: "bg-black/[0.04] border border-black/5 text-[#31302e] hover:bg-black/[0.08]",
+    accent: "bg-accent/10 border border-accent/25 text-accent hover:bg-accent/20",
+    white: "bg-white border border-[#e6e6e6] text-black hover:bg-gray-50 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
   };
 
   const content = (

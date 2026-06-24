@@ -3,7 +3,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { useFirmData, type FirmData } from '@/hooks/use-dashboard-data';
+import { useFirmData } from '@/hooks/use-dashboard-data';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -20,6 +20,8 @@ import {
   Menu,
   X,
   MessageCircle,
+  HelpCircle,
+  UserPlus,
 } from 'lucide-react';
 import { DashboardContext } from './dashboard-context';
 
@@ -27,9 +29,9 @@ import { DashboardContext } from './dashboard-context';
 
 const navItems = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-  { id: 'clients', label: 'Clients', icon: Users, href: '/dashboard/clients' },
-  { id: 'documents', label: 'Documents', icon: FileText, href: '/dashboard/documents' },
-  { id: 'chat', label: 'Chat', icon: MessageCircle, href: '/dashboard/chat' },
+  { id: 'documents', label: 'Documents', icon: FileText, href: '/dashboard/documents', badge: '142' },
+  { id: 'clients', label: 'Clients', icon: Users, href: '/dashboard/clients', badge: '38' },
+  { id: 'chat', label: 'Chat with Enma', icon: MessageCircle, href: '/dashboard/chat', pulse: true },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/settings' },
 ];
 
@@ -68,10 +70,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#f6f5f4] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-accent animate-spin" />
-          <p className="text-white/30 text-sm">Loading your dashboard...</p>
+          <Loader2 className="w-8 h-8 text-[#0075de] animate-spin" />
+          <p className="text-[#615d59] text-sm font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -85,9 +87,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     return segment || 'overview';
   };
 
+  const getWorkspaceInitials = () => {
+    if (!firmData?.firm_name) return 'SC';
+    return firmData.firm_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
+  };
+
   return (
     <DashboardContext.Provider value={{ user, firmData, firmLoading, globalSearch, setGlobalSearch }}>
-      <div className="min-h-screen bg-black text-white font-sans flex overflow-hidden h-screen">
+      <div className="min-h-screen bg-[#f6f5f4] text-black font-sans flex overflow-hidden h-screen selection:bg-[#0075de]/20">
         {/* Mobile Sidebar Overlay */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -95,7 +102,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
           )}
@@ -105,25 +112,54 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <aside
           className={`
             fixed lg:static inset-y-0 left-0 z-50
-            w-64 border-r border-white/5 bg-black/80 backdrop-blur-3xl flex flex-col shrink-0
+            w-64 border-r border-[#e6e6e6] bg-[#f6f5f4] flex flex-col shrink-0
             transform transition-transform duration-300 ease-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}
         >
-          <div className="p-6 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_12px_rgba(255,78,0,0.8)]" />
-              <span className="text-white font-bold text-xl tracking-tight">Enma.</span>
-            </Link>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-white/40 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          {/* Workspace Switcher Header */}
+          <div className="p-4 pb-2">
+            <div className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-black/5 transition-colors cursor-pointer">
+              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#0075de] text-white font-extrabold text-[14px]">
+                {getWorkspaceInitials()}
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-[14px] font-bold text-black truncate">
+                  {firmData?.firm_name || 'Sharma & Co'}
+                </div>
+                <div className="text-[12px] text-[#615d59]">
+                  {firmData?.subscription_plan === 'trial' ? 'Professional Trial' : 'Professional Plan'}
+                </div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#615d59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
           </div>
 
-          <nav className="flex-1 px-3 space-y-1 mt-4">
+          {/* Sidebar Search */}
+          <div className="px-4 mb-2.5">
+            <div className="flex items-center gap-2 px-2.5 py-1.5 bg-black/[0.04] border border-transparent rounded-md transition-all focus-within:border-[#e6e6e6] focus-within:bg-white focus-within:shadow-sm">
+              <Search className="w-3.5 h-3.5 text-[#615d59] shrink-0" />
+              <input
+                type="text"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                placeholder="Search..."
+                className="bg-transparent border-none outline-none text-xs w-full text-black placeholder:text-[#a39e98]"
+              />
+              {globalSearch ? (
+                <button onClick={() => setGlobalSearch('')} className="text-[#a39e98] hover:text-black">
+                  <X className="w-3 h-3" />
+                </button>
+              ) : (
+                <span className="text-[10px] text-[#a39e98] bg-white border border-[#e6e6e6] px-1 py-0.5 rounded font-mono select-none">⌘K</span>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation Rows */}
+          <nav className="flex-1 px-2.5 space-y-0.5">
             {navItems.map((item) => {
               const isActive = getActiveNav() === item.id;
               return (
@@ -132,133 +168,145 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={`
-                    w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                    relative w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors group
                     ${isActive
-                      ? 'bg-white/10 text-white border border-white/10'
-                      : 'text-white/40 hover:text-white hover:bg-white/5 border border-transparent'
+                      ? 'bg-[#0075de]/8 text-black font-semibold'
+                      : 'text-[#31302e] hover:bg-black/5'
                     }
                   `}
                 >
-                  <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-accent' : 'group-hover:text-white/60'}`} />
-                  <span className="text-sm font-medium">{item.label}</span>
                   {isActive && (
-                    <motion.div
-                      layoutId="sidebar-indicator"
-                      className="ml-auto w-1.5 h-1.5 rounded-full bg-accent"
-                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    />
+                    <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] bg-[#0075de] rounded-r-md" />
+                  )}
+                  <item.icon className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-[#0075de] stroke-[2.2]' : 'text-[#31302e] stroke-[1.8]'}`} />
+                  <span className="text-sm">{item.label}</span>
+
+                  {item.badge && (
+                    <span className="ml-auto font-mono text-[11px] text-[#615d59] bg-white border border-[#e6e6e6] px-1.5 py-0.2 rounded-full font-bold">
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {item.pulse && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1aae39] animate-pulse" />
                   )}
                 </Link>
               );
             })}
+
+            <div className="text-[11px] font-bold tracking-wider text-[#a39e98] uppercase px-3 pt-6 pb-2">
+              Workspace
+            </div>
+
+            <Link
+              href="/dashboard/settings"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5"
+            >
+              <Settings className="w-4 h-4 stroke-[1.8]" />
+              <span className="text-sm">Settings</span>
+            </Link>
+
+            <button
+              onClick={() => alert('Teammate invitation is a premium feature.')}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5 text-left cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4 stroke-[1.8]" />
+              <span className="text-sm">Invite teammate</span>
+            </button>
+
+            <button
+              onClick={() => alert('Support tickets can be filed in Chat widget.')}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:bg-black/5 text-left cursor-pointer"
+            >
+              <HelpCircle className="w-4 h-4 stroke-[1.8]" />
+              <span className="text-sm">Help & support</span>
+            </button>
           </nav>
 
-          <div className="p-4 border-t border-white/5">
-            {/* Plan Info */}
-            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 mb-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-accent" />
+          {/* Bottom Panel */}
+          <div className="p-4 mt-auto border-t border-[#e6e6e6]">
+            {/* Upgrade Nudge */}
+            <div className="bg-white border border-[#e6e6e6] rounded-xl p-3.5 mb-3.5 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[#d6b6f6] to-[#b48be0] flex items-center justify-center">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#391c57]" />
                 </div>
-                <span className="text-xs font-bold text-white/60 uppercase tracking-wider">
-                  {firmData?.subscription_plan === 'trial' ? 'Free Trial' : 'Pro Plan'}
-                </span>
+                <span className="text-xs font-bold text-black">142 / unlimited</span>
               </div>
-              <p className="text-[11px] text-white/30 leading-relaxed">
-                {firmData?.onboarding_completed
-                  ? 'Your firm is connected and processing documents.'
-                  : 'Complete setup to start processing documents.'}
+              <div className="h-1 bg-[#f6f5f4] rounded-full overflow-hidden mb-2">
+                <div className="h-full w-[62%] bg-[#0075de] rounded-full" />
+              </div>
+              <p className="text-[11px] text-[#615d59] leading-relaxed">
+                Docs processed this month. {firmData?.subscription_plan === 'trial' ? 'Free trial' : 'Pro plan'} resets in 13 days.
               </p>
             </div>
 
             {/* Telegram Status */}
-            {firmData?.telegram_chat_id && (
+            {firmData?.id && (
               <a
-                href={firmData?.id ? `https://t.me/enma12bot?start=${firmData.id}` : "https://t.me/enma12bot"}
+                href={`https://t.me/enma12bot?start=${firmData.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#229ED9]/60 hover:text-[#229ED9] hover:bg-[#229ED9]/5 transition-all duration-200 mb-2"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#229ED9] hover:bg-[#229ED9]/5 transition-colors mb-2 text-xs font-medium"
               >
-                <Send className="w-4 h-4" />
-                <span className="text-xs font-medium">Telegram Bot</span>
-                <div className="ml-auto w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <Send className="w-3.5 h-3.5" />
+                <span>Telegram Bot</span>
+                <span className="ml-auto w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
               </a>
             )}
 
             {/* Sign Out */}
             <button
               onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:text-red-400 hover:bg-red-400/5 transition-all duration-200"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[#31302e] hover:text-red-600 hover:bg-red-500/5 transition-colors cursor-pointer text-left"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="text-sm font-medium">Sign Out</span>
+              <LogOut className="w-4 h-4 stroke-[1.8]" />
+              <span className="text-sm">Sign Out</span>
             </button>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col overflow-hidden relative">
-          {/* Background Effects */}
-          <div className="absolute inset-0 bg-noise pointer-events-none z-0" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,78,0,0.04),transparent)] pointer-events-none" />
-
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col overflow-hidden relative bg-[#f6f5f4]">
           {/* Top Header */}
-          <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0 relative z-10 bg-black/50 backdrop-blur-xl">
-            {/* Mobile Menu Button */}
+          <header className="h-14 border-b border-[#e6e6e6] flex items-center justify-between px-6 shrink-0 relative z-10 bg-white/80 backdrop-blur-xl">
+            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5"
+              className="lg:hidden w-8 h-8 rounded-md flex items-center justify-center border border-[#e6e6e6] text-[#615d59] hover:bg-black/5"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4" />
             </button>
 
-            {/* Search */}
-            <div className="hidden sm:flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 py-2 w-80 lg:w-96 transition-all focus-within:border-accent/30 focus-within:bg-white/[0.07]">
-              <Search className="w-4 h-4 text-white/30 shrink-0" />
-              <input
-                type="text"
-                value={globalSearch}
-                onChange={(e) => setGlobalSearch(e.target.value)}
-                placeholder="Search clients, documents, or queries..."
-                className="bg-transparent border-none outline-none text-sm w-full placeholder:text-white/20"
-              />
-              {globalSearch && (
-                <button onClick={() => setGlobalSearch('')} className="text-white/30 hover:text-white">
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+            {/* Breadcrumb Info */}
+            <div className="flex items-center gap-1.5 text-[13px] text-[#615d59]">
+              <span className="font-semibold text-black">{firmData?.firm_name || 'Sharma & Co'}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a39e98" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+              <span className="capitalize">{getActiveNav()}</span>
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all relative">
-                <Bell className="w-5 h-5" />
-                <div className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full border-2 border-black" />
+            {/* Quick Actions & Avatar */}
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => alert('Add client feature is coming soon.')}
+                className="py-1.5 px-3.5 bg-[#0075de] hover:bg-[#005bb5] text-white rounded-full font-medium text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                Add client
               </button>
 
-              {/* User Info */}
-              <div className="flex items-center gap-3 pl-3 border-l border-white/10">
-                <div className="text-right hidden md:block">
-                  {firmLoading ? (
-                    <div className="space-y-1.5">
-                      <div className="h-3 w-24 bg-white/10 rounded animate-pulse" />
-                      <div className="h-2.5 w-16 bg-white/5 rounded animate-pulse" />
-                    </div>
-                  ) : (
-                    <>
-                      <p className="text-sm font-medium text-white">{firmData?.ca_name || 'Admin User'}</p>
-                      <p className="text-[11px] text-white/40">{firmData?.firm_name || user?.email}</p>
-                    </>
-                  )}
-                </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-orange-600 flex items-center justify-center font-bold text-sm shadow-lg shadow-accent/20">
-                  {(firmData?.ca_name || 'AU').split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2)}
-                </div>
+              <button className="w-8 h-8 rounded-full border border-[#e6e6e6] bg-white flex items-center justify-center text-[#615d59] hover:bg-gray-50 transition-colors relative cursor-pointer">
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#0075de] rounded-full" />
+              </button>
+
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff64c8] to-[#d6b6f6] text-white flex items-center justify-center font-bold text-[13px] shadow-sm select-none">
+                {getWorkspaceInitials()}
               </div>
             </div>
           </header>
 
-          {/* Page Content */}
+          {/* Page Content Panel */}
           <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
             <AnimatePresence mode="wait">
               <motion.div
@@ -266,8 +314,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="p-4 lg:p-8"
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="p-6 md:p-10 max-w-[1400px] mx-auto"
               >
                 {children}
               </motion.div>
@@ -278,3 +326,4 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </DashboardContext.Provider>
   );
 }
+

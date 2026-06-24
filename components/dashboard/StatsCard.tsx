@@ -20,6 +20,7 @@ function useCountUp(target: number, duration: number = 1200, enabled: boolean = 
 
   useEffect(() => {
     if (!enabled || target === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCount(target);
       return;
     }
@@ -47,34 +48,34 @@ export function StatsCard({ label, value, icon: Icon, color, prefix = '', suffix
 
   if (loading) {
     return (
-      <div className="glass-card rounded-[24px] p-6 relative overflow-hidden">
-        <div className="flex items-center justify-between mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-white/5 animate-pulse" />
-          <div className="w-12 h-4 bg-white/5 rounded animate-pulse" />
+      <div className="bg-white border border-[#e6e6e6] rounded-[20px] p-6 relative overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between mb-5">
+          <div className="w-10 h-10 rounded-xl bg-black/5 animate-pulse" />
         </div>
-        <div className="h-3 w-20 bg-white/5 rounded animate-pulse mb-2" />
-        <div className="h-8 w-16 bg-white/10 rounded animate-pulse" />
+        <div className="h-3 w-20 bg-black/5 rounded animate-pulse mb-2.5" />
+        <div className="h-8 w-16 bg-black/5 rounded animate-pulse" />
       </div>
     );
   }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="glass-card rounded-[24px] p-6 group hover:border-white/20 transition-all duration-300 shadow-[0_0_0_transparent] hover:shadow-[0_15px_40px_rgba(255,78,0,0.06)] relative overflow-hidden cursor-default"
+      className="bg-white border border-[#e6e6e6] rounded-[20px] p-6 group hover:border-[#ddd] hover:shadow-[0_8px_30px_rgb(0,0,0,0.03)] transition-all duration-300 relative overflow-hidden cursor-default shadow-sm"
     >
-      <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[40px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-      <div className="flex items-center justify-between mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all">
-          <Icon className={`w-6 h-6 ${color}`} />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#0075de]/5 blur-[40px] rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="flex items-center justify-between mb-5">
+        <div className="w-10 h-10 rounded-xl bg-black/[0.03] flex items-center justify-center border border-transparent group-hover:border-black/5 transition-all">
+          <Icon className={`w-5 h-5 ${color}`} />
         </div>
       </div>
-      <p className="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">{label}</p>
-      <h3 className="text-3xl font-serif font-medium tracking-tight">
+      <p className="text-[#615d59] text-[11px] font-bold uppercase tracking-wider mb-1">{label}</p>
+      <h3 className="text-3xl font-bold tracking-tight text-black">
         {prefix}{animatedValue.toLocaleString('en-IN')}{suffix}
       </h3>
     </motion.div>
   );
 }
+

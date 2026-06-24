@@ -19,21 +19,20 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed top-6 left-0 right-0 z-50 px-6">
-      <div className="max-w-6xl mx-auto flex items-center justify-between bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-8 py-3">
-      <Link href="/" className="flex items-center gap-2">
-        <div className="text-4xl font-serif italic text-white tracking-wide drop-shadow-md">
-          Enma Labs
-        </div>
-      </Link>
+    <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-md border-b border-[#e6e6e6] px-6">
+      <div className="max-w-6xl mx-auto flex items-center justify-between py-3.5">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-accent text-white font-extrabold text-[15px] tracking-tighter">E</span>
+          <span className="font-bold text-[17px] text-black tracking-tight">Enma</span>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
-          {['Home', 'Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
+          {['Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
             <a
               key={item}
-              href={item === 'Home' ? '/' : `#${item.toLowerCase().replace(/ /g, '-')}`}
-              className="text-[13px] font-medium text-white/70 hover:text-white transition-colors"
+              href={`#${item.toLowerCase().replace(/ /g, '-')}`}
+              className="text-[14px] font-medium text-[#31302e] hover:text-accent transition-colors"
             >
               {item}
             </a>
@@ -43,23 +42,22 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             href="/login"
-            className="text-[13px] font-medium text-white/70 hover:text-white transition-colors px-4"
+            className="text-[14px] font-medium text-[#31302e] hover:text-black transition-colors px-4"
           >
-            Login
+            Log in
           </Link>
           <GlassButton
-            href="/book-demo"
+            href="/signin"
             variant="white"
-            className="px-5 py-2"
+            className="px-5 py-2 border-[#e6e6e6] hover:border-black/20"
           >
-            Book a Demo
-            <span className="text-[10px]">↗</span>
+            Get Enma free
           </GlassButton>
         </div>
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white/70 hover:text-white"
+          className="md:hidden text-black/60 hover:text-black"
           onClick={() => setMobileMenuOpen(true)}
         >
           <Menu className="w-5 h-5" />
@@ -74,7 +72,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 md:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
@@ -82,22 +80,22 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-72 bg-black border-l border-white/10 z-50 p-8 flex flex-col md:hidden"
+              className="fixed top-0 right-0 bottom-0 w-72 bg-[#f6f5f4] border-l border-[#e6e6e6] z-50 p-8 flex flex-col md:hidden"
             >
               <div className="flex justify-end mb-12">
                 <button
-                  className="text-white/30 hover:text-white"
+                  className="text-black/40 hover:text-black"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <nav className="flex flex-col gap-8 mb-12">
+              <nav className="flex flex-col gap-6 mb-12">
                 {['Home', 'Features', 'Security', 'How It Works', 'Pricing'].map((item) => (
                   <a
                     key={item}
                     href={item === 'Home' ? '/' : `#${item.toLowerCase().replace(/ /g, '-')}`}
-                    className="text-2xl font-serif text-white/50 hover:text-white transition-colors"
+                    className="text-xl font-medium text-[#31302e] hover:text-black transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item}
@@ -112,15 +110,15 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="w-4 h-4" />
-                  Login
+                  Log in
                 </GlassButton>
                 <GlassButton
-                  href="/book-demo"
-                  variant="white"
+                  href="/signin"
+                  variant="primary"
                   className="w-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Book a Demo
+                  Get Enma free
                 </GlassButton>
               </div>
             </motion.div>
