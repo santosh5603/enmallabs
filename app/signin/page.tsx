@@ -26,7 +26,6 @@ function SignInContent() {
   const { user, loading: authLoading } = useAuth();
 
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -49,37 +48,14 @@ function SignInContent() {
         email,
         options: {
           shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (authError) throw authError;
       setOtpSent(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to send verification code. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      const supabase = getSupabase();
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otp.trim(),
-        type: 'email',
-      });
-
-      if (verifyError) throw verifyError;
-
-      // Verification succeeded. The auth-context will pick up the session change.
-      router.push('/onboarding');
-    } catch (err: any) {
-      setError(err.message || 'Invalid or expired code. Please try again.');
+      setError(err.message || 'Failed to send verification link. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -157,22 +133,25 @@ function SignInContent() {
 
           <AnimatePresence mode="wait">
             {otpSent ? (
-              /* OTP Verification State */
+              /* Verification Link Sent State */
               <motion.div
-                key="otp-verify"
+                key="email-sent"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
               >
                 <div className="mb-8 text-center">
                   <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#0075de]/10 border border-[#0075de]/20 flex items-center justify-center text-[#0075de]">
-                    <KeyRound className="w-6 h-6" />
+                    <Mail className="w-6 h-6" />
                   </div>
-                  <h1 className="text-[32px] font-bold tracking-[-0.625px] leading-tight text-black mb-2">Verify Code</h1>
-                  <p className="text-[#615d59] text-sm">
-                    We sent a 6-digit verification code to
+                  <h1 className="text-[32px] font-bold tracking-[-0.625px] leading-tight text-black mb-2">Check your mail</h1>
+                  <p className="text-[#615d59] text-sm leading-relaxed">
+                    We sent a secure verification link to
                   </p>
-                  <p className="text-[#0075de] font-bold text-sm mt-1">{email}</p>
+                  <p className="text-[#0075de] font-bold text-sm mt-1 mb-4">{email}</p>
+                  <p className="text-[#615d59] text-xs leading-relaxed max-w-xs mx-auto">
+                    Click the link in the email to verify your email address and continue setting up your account.
+                  </p>
                 </div>
 
                 {error && (
@@ -182,45 +161,32 @@ function SignInContent() {
                   </div>
                 )}
 
-                <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Enter 6-digit OTP"
-                      required
-                      maxLength={6}
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                      className="w-full bg-white border border-[#ddd] rounded-md px-4 py-3.5 text-center text-2xl font-mono tracking-[0.5em] focus:border-[#0075de] focus:ring-2 focus:ring-[#0075de]/10 outline-none transition-all placeholder:text-[#a39e98] placeholder:text-sm placeholder:font-sans placeholder:tracking-normal text-black"
-                    />
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-blue-50/50 border border-[#0075de]/10 text-center">
+                    <span className="text-xs text-[#0075de] font-semibold flex items-center justify-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0075de] animate-pulse" />
+                      Awaiting verification link click...
+                    </span>
                   </div>
 
                   <button
-                    type="submit"
-                    disabled={loading || otp.length !== 6}
-                    className="w-full py-3 px-4 bg-[#0075de] hover:bg-[#005bb5] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full font-medium text-[15px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                    onClick={() => handleSendOtp(null as any)}
+                    disabled={loading}
+                    className="w-full py-3 px-4 bg-[#0075de] hover:bg-[#005bb5] text-white rounded-full font-medium text-[15px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-sm disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>
                         <Loader2 className="w-4.5 h-4.5 animate-spin" />
-                        Verifying...
+                        Resending...
                       </>
                     ) : (
-                      'Verify & Sign In'
+                      'Resend link'
                     )}
                   </button>
-                </form>
 
-                <div className="mt-8 text-center space-y-4">
                   <button
-                    onClick={() => handleSendOtp(null as any)}
-                    className="text-xs text-[#0075de] hover:underline font-semibold block mx-auto cursor-pointer"
-                  >
-                    Resend verification code
-                  </button>
-                  <button
-                    onClick={() => { setOtpSent(false); setOtp(''); }}
-                    className="flex items-center gap-2 mx-auto text-xs text-[#615d59] hover:text-black transition-colors cursor-pointer"
+                    onClick={() => { setOtpSent(false); }}
+                    className="flex items-center gap-2 mx-auto text-xs text-[#615d59] hover:text-black transition-colors cursor-pointer pt-2"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     Use a different email
